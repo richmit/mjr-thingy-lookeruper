@@ -3,7 +3,7 @@
 ;; Copyright (C) 2026-2026 First Last me@mitchr.me
 
 ;; Author:      Mitch Richling
-;; Version:     0.7
+;; Version:     1.0
 ;; Keywords:    mjr-thingy-lookeruper
 ;; URL:         https://github.com/richmit/mjr-thingy-lookeruper
 
@@ -30,10 +30,23 @@
 
 ;;; Commentary:
 
-;; The mjr-thingy-lookeruper package provides an extensible way to look things.
+;; The mjr-thingy-lookeruper Emacs package provides an extensible way to look up things.
 ;;   - The primary entry point is the function `mjr-thingy-lookeruper'.
 ;;   - Methods for looking things up are defined in `mjr-thingy-lookeruper-methods'
+;;     This variable may be customized allowing the user to add new methods to look up things.
 ;;   - Several example methods are provided in `mjr-thingy-lookeruper-built-in-methods'.
+;;      - UNIX man pages
+;;      - Operating group IDs, group names, user IDs, user names
+;;      - DNS queries
+;;      - Dictionary words
+;;      - Data about files
+;;      - URLs
+;;      - Internet search queries (google, bing, & ebay)
+;;      - Symbols in several languages (Emacs lisp, Common Lisp, R, Perl, 
+;;        Python, Ruby, Julia, C, C++, Matlab, CMake)
+;;      - & & C++ header files
+;;      - ST Micro STM32 parts
+;;      - Books via ISBN
 ;;   - Some utilities related to the variables mentioned above:
 ;;      - `mjr-thingy-lookeruper-get-built-in'
 ;;      - `mjr-thingy-lookeruper-get-method'
@@ -123,13 +136,16 @@
          :actn (lambda (thingy) (hyperspec-lookup (symbol-name thingy))))
    (list :name "cl-symbol(slime)"
          :desc "Lookup a symbol in an interactive SLIME REPL or common lisp buffer using slime-describe-symbol"
+         :pred (lambda () (and (provide 'slime)
+                               (boundp 'slime-net-processes)                ;; List of lisp connections
+                               (boundp 'slime-describe-symbol)              ;; Needed to lookup symbol
+                               (not (zerop (length slime-net-processes))))) ;; Need a connected lisp
          :mode (list 'slime-repl-mode 'lisp-mode)
-         :atpt (lambda () (let ((sym-thingy (symbol-at-point)))
-                            (when (and sym-thingy (not (zerop (length slime-net-processes))))
-                              (let ((str-thingy (substring-no-properties (symbol-name sym-thingy))))
-                                (if (string-match "^[:']" str-thingy)
-                                    (substring str-thingy 1)
-                                    str-thingy)))))
+         :atpt (lambda () (when-let* ((sym-thingy (symbol-at-point))
+                                      (str-thingy (substring-no-properties (symbol-name sym-thingy))))
+                            (if (string-match "^[:']" str-thingy)
+                                (substring str-thingy 1)
+                                str-thingy)))
          :actn (lambda (thingy) (slime-describe-symbol thingy)))
    (list :name "symbol(devdocs.io)"
          :desc "Lookup a symbol via devdocs.io for ruby, perl, & python buffers using browse-url (emacs)"
@@ -219,6 +235,9 @@
 A list lookup methods for mjr-thingy-lookeruper.  Each entry is a property list:
  - :name -- A string with the name of the method (Required) 
  * :desc -- A string with a description of the method (Optional)
+ * :pred -- A predicate function that must be evaluate to non-nil for a method to be used. (Optional)
+            If missing or nil, the method may be used.
+            Frequently used to make sure necessary code has been loaded before use.
  * :mode -- A list of major mode symbols used to a buffer's major mode. (Optional)
             If missing or nil, the method may be used with buffers of any mode
  * :atpt -- A function used to thingy (usually a string but not necessarily) from buffer.  (Optional)
@@ -291,18 +310,20 @@ Results:
    - Many lisp function lookup methods may provide a special environment for displaying the results.
 Variables:
  - mjr-thingy-lookeruper-methods .. Describes the methods for lookup.  Examples include uname, gname, uid, gid, host name, dictionary word, and Google search."
-  (interactive (let ((candidates (if (and transient-mark-mode (region-active-p) (mark))
-                                     (let ((thingy (buffer-substring-no-properties (region-beginning) (region-end))))
-                                       (mapcar (lambda (x) (list (plist-get x :name) thingy)) mjr-thingy-lookeruper-methods))
-                                     (cl-loop for cur-method-properties in mjr-thingy-lookeruper-methods
-                                              for thingy = (and (or current-prefix-arg
-                                                                    (let ((cur-method-mode-list (plist-get cur-method-properties :mode)))                        
-                                                                      (or (null cur-method-mode-list) 
-                                                                          (member major-mode cur-method-mode-list))))
-                                                                (when-let* ((cur-method-tap (plist-get cur-method-properties :atpt)))
-                                                                  (funcall cur-method-tap)))
-                                              when thingy
-                                              collect (list (plist-get cur-method-properties :name) thingy)))))
+  (interactive (let* ((region-string (and transient-mark-mode (region-active-p) (mark) (buffer-substring-no-properties (region-beginning) (region-end))))
+                     (candidates    (cl-loop for cur-method-properties in mjr-thingy-lookeruper-methods
+                                             for thingy = (and (or current-prefix-arg
+                                                                   (let ((cur-method-mode-list (plist-get cur-method-properties :mode)))                        
+                                                                     (or (null cur-method-mode-list) 
+                                                                         (member major-mode cur-method-mode-list))))
+                                                               (let ((cur-method-need (plist-get cur-method-properties :pred)))
+                                                                 (or (null cur-method-need)
+                                                                     (function cur-method-need)))
+                                                               (or region-string
+                                                                   (when-let* ((cur-method-tap (plist-get cur-method-properties :atpt)))
+                                                                     (funcall cur-method-tap))))
+                                             when thingy
+                                             collect (list (plist-get cur-method-properties :name) thingy))))
                  (unless candidates
                    (error "mjr-thingy-lookeruper: Unable to locate suitable lookup methods."))
                  (if (null (cdr candidates))
@@ -341,3 +362,6 @@ Variables:
 (provide 'mjr-thingy-lookeruper)
 
 ;;; filename ends here
+
+(featurep 'browse-url)
+
