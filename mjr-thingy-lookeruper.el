@@ -3,7 +3,7 @@
 ;; Copyright (C) 2026-2026 First Last me@mitchr.me
 
 ;; Author:      Mitch Richling
-;; Version:     0.2
+;; Version:     0.3
 ;; Keywords:    mjr-thingy-lookeruper
 ;; URL:         https://github.com/richmit/mjr-thingy-lookeruper
 
@@ -197,7 +197,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;###autoload
 (defgroup mjr-thingy-lookeruper nil
-  "Access verGo.sh from emacs."
+  "mjr-thingy-lookeruper"
   :group 'external
   :group 'environment)
 
@@ -230,7 +230,7 @@ Interactive use (while not the true order of events in the code, this step-wise 
     - With a prefix argument ....... Ignore the buffer mode
   Step 3: Query the user
     - Only one eligible query ...... Use that method
-    - Multiple eligible queries .... Query the user to choose a method.  IDO mode is required in this case, and an error will result if it is not available.
+    - Multiple eligible queries .... Query the user to choose a method.
     - No eligible queries .......... Error
 Non-Interactive use:  Lookup the-thingy via the-method.
   - THE-METHOD is the :NAME, a string, of a method stored in mjr-thingy-lookeruper-methods.  
