@@ -39,45 +39,37 @@
   (list
    (list :name "man"
          :desc "Look for a UNIX man page via man (emacs)."
-         :mode nil
          :atpt (lambda () (and (thing-at-point-looking-at "\\b\\([a-z0-9_-]+\\)\\b" 20) (match-string 1)))
          :actn #'man)
    (list :name "gid"
          :desc "Lookup a numeric group ID via getent (shell)."
-         :mode nil
          :atpt (lambda () (thing-at-point 'number))
          :actn "getent group %Q")
    (list :name "gname"
          :desc "Lookup a group name (gname) via getent (shell)."
-         :mode nil
          :atpt (lambda () (and (thing-at-point-looking-at "\\b\\([.a-zA-Z0-9_-]+\\)\\b" 20) (match-string 1)))
          :actn "getent group %Q")
    (list :name "uid"
          :desc "Lookup a numeric user ID via getent (shell)."
-         :mode nil
          :atpt (lambda () (thing-at-point 'number))
          :actn "getent passwd %Q")
    (list :name "uname"
          :desc "Look up a user name (uname) with getent (shell)." 
-         :mode nil
          :atpt (lambda () (let ((tmp (and (thing-at-point-looking-at "\\b\\([a-zA-Z][a-zA-Z0-9_-]+\\)\\b" 20) (match-string 1))))
                             (and tmp (cl-find tmp (system-users) :test #'string-equal))))
          :actn "getent passwd %Q")
    (list :name "DNS"
          :desc "Lookup host name via dns-lookup-host (emacs)."
-         :mode nil
          :atpt (lambda () (and (thing-at-point-looking-at "\\([.a-zA-Z0-9_-]+\\.\\(com\\|edu\\|org\\|gov\\)\\)\\b" 20) (match-string 1)))
          :actn #'dns-lookup-host)
    (list :name "IPv4"
          :desc "Lookup IPv4 address via dns-lookup-host (emacs)."
-         :mode nil
          :atpt (lambda () (and (thing-at-point-looking-at "\\b\\(\\([0-9]+\\)\\.\\([0-9]+\\)\\.\\([0-9]+\\)\\.\\([0-9]+\\)\\)\\b" 20) 
                                (cl-every (lambda (x) (let ((y (string-to-number (match-string x)))) (and (<= 0 y) (>= 255 y)))) '(2 3 4 5))
                                (match-string 1)))
          :actn #'dns-lookup-host)
    (list :name "file"
          :desc "Look up file data via fstat.pl or stat (shell)."
-         :mode nil
          :atpt (lambda () (and-let* ((raw-fname (ffap-guess-file-name-at-point))
                                      (          (file-exists-p raw-fname))
                                      (exp-fname (expand-file-name raw-fname)))))
@@ -86,28 +78,20 @@
                  "stat '%Q'"))
    (list :name "URL"
          :desc "Hand URL to browser using browse-url (emacs)."
-         :mode nil
          :atpt (lambda () (thing-at-point 'url))
          :actn #'browse-url)
    (list :name "dictionary"
          :desc "Look up a word via dictionary.reference.com using browse-url (emacs)"
-         :mode nil
          :atpt (lambda () (and (thing-at-point-looking-at "\\b\\([a-zA-Z'-]+\\)\\b" 20) (match-string 1)))
          :actn (lambda (thingy) (browse-url (concat "https://www.merriam-webster.com/dictionary/" (url-hexify-string thingy) ""))))
    (list :name "google"
          :desc "Search via google using browse-url (emacs)"
-         :mode nil
-         :atpt (lambda () (and (thing-at-point-looking-at ".+" 20) (match-string 0)))
          :actn (lambda (thingy) (browse-url (concat "http://google.com/search?q=" (url-hexify-string thingy)))))
    (list :name "bing"
          :desc "Search via bing using browse-url (emacs)"
-         :mode nil
-         :atpt (lambda () (and (thing-at-point-looking-at ".+" 20) (match-string 0)))
          :actn (lambda (thingy) (browse-url (concat "https://www.bing.com/search?q=" (url-hexify-string thingy)))))
    (list :name "ebay"
          :desc "Search via e-bay using browse-url (emacs)"
-         :mode nil
-         :atpt (lambda () (and (thing-at-point-looking-at ".+" 20) (match-string 0)))
          :actn (lambda (thingy) (browse-url (concat "https://www.ebay.com/sch/i.html?_nkw=" (url-hexify-string thingy)))))
    (list :name "el-symbol"
          :desc "Lookup a lisp symbol in an interactive elisp session or in an elisp source file via describe-symbol (emacs)"
@@ -202,12 +186,10 @@
          :actn (lambda (thingy) (browse-url (concat "https://www.mathworks.com/search/user-center?q=" (url-hexify-string (format "%s" thingy)) "&app=documentation&page=1"))))
    (list :name "STM32"
          :desc "Search for a STM32/NUCLEO part on st.com using browse-url (emacs)"
-         :mode nil
          :atpt (lambda () (and (thing-at-point-looking-at "\\b\\(NUCLEO-[A-Z0-9]+\\|STM32[A-Z][A-Z0-9]+\\)\\b" 20) (match-string 1)))
          :actn (lambda (thingy) (browse-url (concat "https://search.st.com/?activeSource=%22Search%22&queryText=%22" (url-hexify-string thingy) "%22"))))
    (list :name "ISBN"
          :desc "Lookup an ISBN (10 or 13) number on isbnsearch.org using browse-url (emacs)"
-         :mode nil
          :atpt (lambda () (and (thing-at-point-looking-at "\\b\\([0-9]\\{10\\}\\|[0-9]-[0-9]\\{6\\}-[0-9][0-9]-[0-9]\\|[0-9]\\{13\\}\\|[0-9]\\{3\\}-[0-9]-[0-9]\\{5\\}-[0-9]\\{3\\}-[0-9]\\)\\b" 25) (match-string 1)))
          :actn (lambda (thingy) (browse-url (concat "https://isbnsearch.org/isbn/" (url-hexify-string (replace-regexp-in-string "[^0-9]" "" thingy))))))
    ))
@@ -222,16 +204,16 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;###autoload
 (defcustom mjr-thingy-lookeruper-methods mjr-thingy-lookeruper-built-in-methods
-  "Lookup methods aviable to mjr-thingy-lookeruper.
-A list defining various things that may be looked up via mjr-thingy-lookeruper.  Each entry is a list of five elements:
- * name of lookup (a string)
- * Documentation string
- * A list of mode symbols used to  match against buffer major mode. Use nil to match any mode.
- * Function used to pull thingy (usually a string but not necessarly) from buffer.  Usually looks near point for regexp.
-   If this is nil, then nothing is automatically pulled from the buffer -- i.e. this item only works with an active region.
- * Command to use to do the lookup.  
-   * A lisp function that takes a single argument
-   * A string for a shell command.  %U is replaced with the URL hexified thingy, and %Q will be replaced with the thingy."
+  "Lookup methods available to mjr-thingy-lookeruper.
+A list lookup methods for mjr-thingy-lookeruper.  Each entry is a property list:
+ - :name -- A string with the name of the method (Required) 
+ * :desc -- A string with a description of the method (Optional)
+ * :mode -- A list of major mode symbols used to a buffer's major mode. (Optional)
+            If missing or nil, the method may be used with buffers of any mode
+ * :atpt -- A function used to thingy (usually a string but not necessarily) from buffer.  (Optional)
+            If missing or nil, the method may only be used with an active region.
+ * :actn -- A function or shell command string used to perform the lookup.
+            - In shell command strings %U is replaced with the URL hexified thingy, and %Q will be replaced with the thingy."
   :type 'list
   :group 'mjr-thingy-lookeruper)
 
