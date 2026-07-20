@@ -215,7 +215,9 @@ A list lookup methods for mjr-thingy-lookeruper.  Each entry is a property list:
  * :atpt -- A function used to thingy (usually a string but not necessarily) from buffer.  (Optional)
             If missing or nil, the method may only be used with an active region.
  * :actn -- A function or shell command string used to perform the lookup. (Required)
-            - In shell command strings %U is replaced with the URL hexified thingy, and %Q will be replaced with the thingy."
+            - In shell command strings %U is replaced with the URL hexified thingy, and %Q will be replaced with the thingy.
+The functions `mjr-thingy-lookeruper-get-built-in', `mjr-thingy-lookeruper-add-method', and `mjr-thingy-lookeruper-delete-method'
+may be helpfull to manage this list."
   :type 'list
   :group 'mjr-thingy-lookeruper)
 
@@ -232,6 +234,7 @@ A list lookup methods for mjr-thingy-lookeruper.  Each entry is a property list:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;###autoload
 (defun mjr-thingy-lookeruper-add-method (method-properties) 
+  "Add a new method to mjr-thingy-lookeruper-methods.  Error if a method already exists with the same :NAME."
   (when (not (plistp method-properties))
     (error "mjr-thingy-lookeruper-add-method: method is not a valid property list."))
   (when (not (plist-get method-properties :name))
@@ -245,8 +248,13 @@ A list lookup methods for mjr-thingy-lookeruper.  Each entry is a property list:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;###autoload
 (defun mjr-thingy-lookeruper-delete-method (method-name) 
-  (setq mjr-thingy-lookeruper-delete-method
-        (cl-remove-if (lambda (x) (string-equal method-name (plist-get x :name))) mjr-thingy-lookeruper-methods)))
+  "Delete method with given name from mjr-thingy-lookeruper-methods, and return properties of deleted method."
+  (let ((method-properties (mjr-thingy-lookeruper-get-method method-name)))
+    (unless method-properties
+      (error "mjr-thingy-lookeruper-delete-method: No method named '%s' found in mjr-thingy-lookeruper-methods." method-name))
+    (setq mjr-thingy-lookeruper-methods
+          (cl-remove-if (lambda (x) (string-equal method-name (plist-get x :name))) mjr-thingy-lookeruper-methods))
+    method-properties))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;###autoload
