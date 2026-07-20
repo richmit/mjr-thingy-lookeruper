@@ -3,7 +3,7 @@
 ;; Copyright (C) 2026-2026 First Last me@mitchr.me
 
 ;; Author:      Mitch Richling
-;; Version:     0.3
+;; Version:     0.4
 ;; Keywords:    mjr-thingy-lookeruper
 ;; URL:         https://github.com/richmit/mjr-thingy-lookeruper
 
@@ -21,7 +21,7 @@
 ;; As a package pulled from github:
 ;;   - Run the following:
 ;;     (package-vc-install (list 'mjr-thingy-lookeruper
-;;                               :url "mjr-thingy-lookeruper"
+;;                               :url "https://github.com/richmit/mjr-thingy-lookeruper"
 ;;                               :rev 'newest))
 
 ;;; Commentary:
@@ -32,6 +32,8 @@
 ;; in `mjr-thingy-lookeruper-built-in-methods'.
 
 ;;; Code:
+
+(require 'cl-lib)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;###autoload
@@ -212,10 +214,39 @@ A list lookup methods for mjr-thingy-lookeruper.  Each entry is a property list:
             If missing or nil, the method may be used with buffers of any mode
  * :atpt -- A function used to thingy (usually a string but not necessarily) from buffer.  (Optional)
             If missing or nil, the method may only be used with an active region.
- * :actn -- A function or shell command string used to perform the lookup.
+ * :actn -- A function or shell command string used to perform the lookup. (Required)
             - In shell command strings %U is replaced with the URL hexified thingy, and %Q will be replaced with the thingy."
   :type 'list
   :group 'mjr-thingy-lookeruper)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;###autoload
+(defun mjr-thingy-lookeruper-get-built-in (method-name) 
+  (cl-find-if (lambda (x) (string-equal the-method (plist-get x :name))) mjr-thingy-lookeruper-built-in-methods))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;###autoload
+(defun mjr-thingy-lookeruper-get-method (method-name) 
+  (cl-find-if (lambda (x) (string-equal the-method (plist-get x :name))) mjr-thingy-lookeruper-methods))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;###autoload
+(defun mjr-thingy-lookeruper-add-method (method-properties) 
+  (when (not (plistp method-properties))
+    (error "mjr-thingy-lookeruper-add-method: method is not a valid property list."))
+  (when (not (plist-get method-properties :name))
+    (error "mjr-thingy-lookeruper-add-method: peoperty :name must be present and non-nil."))
+  (when (not (plist-get method-properties :actn))
+    (error "mjr-thingy-lookeruper-add-method: peoperty :actn must be present and non-nil."))
+  (when (mjr-thingy-lookeruper-get-method method-name)
+    (error "mjr-thingy-lookeruper-add-method: peoperty method with the same name is already on mjr-thingy-lookeruper-methods list!"))
+  (add-to-list mjr-thingy-lookeruper-methods method-properties))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;###autoload
+(defun mjr-thingy-lookeruper-delete-method (method-name) 
+  (setq mjr-thingy-lookeruper-delete-method
+        (cl-remove-if (lambda (x) (string-equal the-method (plist-get x :name))) mjr-thingy-lookeruper-methods)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;###autoload
@@ -232,7 +263,7 @@ Interactive use (while not the true order of events in the code, this step-wise 
     - Only one eligible query ...... Use that method
     - Multiple eligible queries .... Query the user to choose a method.
     - No eligible queries .......... Error
-Non-Interactive use:  Lookup the-thingy via the-method.
+Non-Interactive use: Lookup THE-THINGY via THE-METHOD.
   - THE-METHOD is the :NAME, a string, of a method stored in mjr-thingy-lookeruper-methods.  
   - THE-THINGY is an object, usually a string, to look up with the named method.
   - If THE-METHOD is not found on mjr-thingy-lookeruper-methods, then error.
