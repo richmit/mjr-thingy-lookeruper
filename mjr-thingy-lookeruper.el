@@ -3,7 +3,7 @@
 ;; Copyright (C) 2026-2026 First Last me@mitchr.me
 
 ;; Author:      Mitch Richling
-;; Version:     0.4
+;; Version:     0.5
 ;; Keywords:    mjr-thingy-lookeruper
 ;; URL:         https://github.com/richmit/mjr-thingy-lookeruper
 
@@ -222,12 +222,12 @@ A list lookup methods for mjr-thingy-lookeruper.  Each entry is a property list:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;###autoload
 (defun mjr-thingy-lookeruper-get-built-in (method-name) 
-  (cl-find-if (lambda (x) (string-equal the-method (plist-get x :name))) mjr-thingy-lookeruper-built-in-methods))
+  (cl-find-if (lambda (x) (string-equal method-name (plist-get x :name))) mjr-thingy-lookeruper-built-in-methods))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;###autoload
 (defun mjr-thingy-lookeruper-get-method (method-name) 
-  (cl-find-if (lambda (x) (string-equal the-method (plist-get x :name))) mjr-thingy-lookeruper-methods))
+  (cl-find-if (lambda (x) (string-equal method-name (plist-get x :name))) mjr-thingy-lookeruper-methods))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;###autoload
@@ -246,7 +246,7 @@ A list lookup methods for mjr-thingy-lookeruper.  Each entry is a property list:
 ;;;###autoload
 (defun mjr-thingy-lookeruper-delete-method (method-name) 
   (setq mjr-thingy-lookeruper-delete-method
-        (cl-remove-if (lambda (x) (string-equal the-method (plist-get x :name))) mjr-thingy-lookeruper-methods)))
+        (cl-remove-if (lambda (x) (string-equal method-name (plist-get x :name))) mjr-thingy-lookeruper-methods)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;###autoload
