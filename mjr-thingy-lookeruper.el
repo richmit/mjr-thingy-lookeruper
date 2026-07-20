@@ -1,9 +1,9 @@
-;; mjr-thingy-lookeruper --- Provide verGo.sh in Emacs. -*-coding: utf-8 lexical-binding:t mode:emacs-lisp -*-
+;; mjr-thingy-lookeruper --- Provide verGo.sh in Emacs. -*-coding: utf-8 lexical-binding:t; mode:emacs-lisp; fill-column:158 -*-
 
 ;; Copyright (C) 2026-2026 First Last me@mitchr.me
 
 ;; Author:      Mitch Richling
-;; Version:     0.6
+;; Version:     0.7
 ;; Keywords:    mjr-thingy-lookeruper
 ;; URL:         https://github.com/richmit/mjr-thingy-lookeruper
 
@@ -23,13 +23,22 @@
 ;;     (package-vc-install (list 'mjr-thingy-lookeruper
 ;;                               :url "https://github.com/richmit/mjr-thingy-lookeruper"
 ;;                               :rev 'newest))
+;;
+;; I normally bind C-c l to mjr-thingy-lookeruper like this
+;;      (keymap-global-set "C-c l"     'mjr-thingy-lookeruper))
+;;
 
 ;;; Commentary:
 
-;; The mjr-thingy-lookeruper package provides an extensible way to look things up via the `mjr-thingy-lookeruper' function.
-;; Several methods are provided in the constant `mjr-thingy-lookeruper-built-in-methods'.
-;; The lookup methods used are defined in the `mjr-thingy-lookeruper-methods' variable -- which defaults to everything 
-;; in `mjr-thingy-lookeruper-built-in-methods'.
+;; The mjr-thingy-lookeruper package provides an extensible way to look things.
+;;   - The primary entry point is the function `mjr-thingy-lookeruper'.
+;;   - Methods for looking things up are defined in `mjr-thingy-lookeruper-methods'
+;;   - Several example methods are provided in `mjr-thingy-lookeruper-built-in-methods'.
+;;   - Some utilities related to the variables mentioned above:
+;;      - `mjr-thingy-lookeruper-get-built-in'
+;;      - `mjr-thingy-lookeruper-get-method'
+;;      - `mjr-thingy-lookeruper-delete-method'
+;;      - `mjr-thingy-lookeruper-add-method'
 
 ;;; Code:
 
