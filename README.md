@@ -45,3 +45,7 @@ from github:
                           :url "https://github.com/richmit/mjr-thingy-lookeruper"
                           :rev 'newest))
                         
+Be sure to install and load any packages  required by any of the methods
+included on `mjr-thingy-lookeruper-methods'.  For example several of the
+built in methods require things like: `thingatpt' & `browse-url'.
+
