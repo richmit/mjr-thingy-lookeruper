@@ -19,7 +19,7 @@ Several example methods are provided in `mjr-thingy-lookeruper-built-in-methods'
  - URLs
  - Internet search queries (google, bing, & ebay)
  - Symbols in several languages (Emacs lisp, Common Lisp, R, Perl, Python, Ruby, Julia, C, C++, Matlab, CMake)
- - & & C++ header files
+ - C & C++ header files
  - ST Micro STM32 parts
  - Books via ISBN
 
