@@ -1,57 +1,35 @@
 ;; mjr-thingy-lookeruper --- Provide verGo.sh in Emacs. -*-coding: utf-8 lexical-binding:t; mode:emacs-lisp; fill-column:158 -*-
 
-;; Copyright (C) 2026-2026 First Last me@mitchr.me
+;; Copyright (c) 2026-2026 Mitch Richling <https://www.mitchr.me>.  All rights reserved.
+;;
+;; Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+;;
+;; 1. Redistributions of source code must retain the above copyright notice, this list of conditions, and the following disclaimer.
+;;
+;; 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions, and the following disclaimer in the documentation
+;;    and/or other materials provided with the distribution.
+;;
+;; 3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without
+;;    specific prior written permission.
+;;
+;; THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+;; IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+;; FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+;; SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
+;; TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ;; Author:      Mitch Richling
-;; Version:     1.5
+;; Version:     1.8
 ;; Keywords:    mjr-thingy-lookeruper
 ;; URL:         https://github.com/richmit/mjr-thingy-lookeruper
 
 ;; This file is not part of Emacs
 
 ;;; Install:
-
-;; Manual (with `load-path'): 
-;;   - Put mjr-thingy-lookeruper.el somplace
-;;   - Add the directory with mjr-thingy-lookeruper.el to the `load-path'
-;;   - Add this to ~/.emacs: (require 'mjr-thingy-lookeruper)
-;; Manual (no `load-path' option):
-;;   - Put mjr-thingy-lookeruper.el somplace
-;;   - Add this to ~/.emacs: (require 'mjr-thingy-lookeruper "fully_qualified_path_name_for_mjr-thingy-lookeruper.el")
-;; As a package pulled from github:
-;;   - Run the following:
-;;     (package-vc-install (list 'mjr-thingy-lookeruper
-;;                               :url "https://github.com/richmit/mjr-thingy-lookeruper"
-;;                               :rev 'newest))
-;;
-;; I normally bind C-c l to mjr-thingy-lookeruper like this
-;;      (keymap-global-set "C-c l"     'mjr-thingy-lookeruper)
-;;
+;; See the README: https://github.com/richmit/mjr-thingy-lookeruper/
 
 ;;; Commentary:
-
-;; The mjr-thingy-lookeruper Emacs package provides an extensible way to look up things.
-;;   - The primary entry point is the function `mjr-thingy-lookeruper'.
-;;   - Methods for looking things up are defined in `mjr-thingy-lookeruper-methods'
-;;     This variable may be customized allowing the user to add new methods to look up things.
-;;   - Several example methods are provided in `mjr-thingy-lookeruper-built-in-methods'.
-;;      - UNIX man pages
-;;      - Operating group IDs, group names, user IDs, user names
-;;      - DNS queries
-;;      - Dictionary words
-;;      - Data about files
-;;      - URLs
-;;      - Internet search queries (google, bing, & ebay)
-;;      - Symbols in several languages (Emacs lisp, Common Lisp, R, Perl, 
-;;        Python, Ruby, Julia, C, C++, Matlab, CMake)
-;;      - & & C++ header files
-;;      - ST Micro STM32 parts
-;;      - Books via ISBN
-;;   - Some utilities related to the variables mentioned above:
-;;      - `mjr-thingy-lookeruper-get-built-in'
-;;      - `mjr-thingy-lookeruper-get-method'
-;;      - `mjr-thingy-lookeruper-delete-method'
-;;      - `mjr-thingy-lookeruper-add-method'
+;; See the README: https://github.com/richmit/mjr-thingy-lookeruper/
 
 ;;; Code:
 
