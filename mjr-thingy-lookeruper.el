@@ -3,7 +3,7 @@
 ;; Copyright (C) 2026-2026 First Last me@mitchr.me
 
 ;; Author:      Mitch Richling
-;; Version:     1.3
+;; Version:     1.4
 ;; Keywords:    mjr-thingy-lookeruper
 ;; URL:         https://github.com/richmit/mjr-thingy-lookeruper
 
@@ -276,10 +276,8 @@ may be helpfull to manage this list."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;###autoload
 (defun mjr-thingy-lookeruper-delete-method (method-name) 
-  "Delete method with given name from mjr-thingy-lookeruper-methods, and return properties of deleted method."
+  "Delete method with given name from mjr-thingy-lookeruper-methods, and return properties of deleted method.  Return nil if nothing was deleted."
   (let ((method-properties (mjr-thingy-lookeruper-get-method method-name)))
-    (unless method-properties
-      (error "mjr-thingy-lookeruper-delete-method: No method named '%s' found in mjr-thingy-lookeruper-methods." method-name))
     (setq mjr-thingy-lookeruper-methods
           (cl-remove-if (lambda (x) (string-equal method-name (plist-get x :name))) mjr-thingy-lookeruper-methods))
     method-properties))
@@ -335,7 +333,7 @@ Variables:
   (if (stringp the-thingy)
       (setq the-thingy (substring-no-properties the-thingy)))
   (message "mjr-thingy-lookeruper: '%s' via '%s'" the-thingy the-method)
-  (let ((the-method-properties (cl-find-if (lambda (x) (string-equal the-method (plist-get x :name))) mjr-thingy-lookeruper-methods)))
+  (let ((the-method-properties (mjr-thingy-lookeruper-get-method the-method)))
     (unless the-method-properties
       (error "mjr-thingy-lookeruper: Invaid value for the-method: %s!" the-method))
     (let ((the-method-command (plist-get the-method-properties :actn)))
@@ -362,6 +360,4 @@ Variables:
 (provide 'mjr-thingy-lookeruper)
 
 ;;; filename ends here
-
-(featurep 'browse-url)
 
