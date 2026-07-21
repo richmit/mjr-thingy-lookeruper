@@ -29,9 +29,7 @@ Some utilities related to the variables mentioned above:
  - `mjr-thingy-lookeruper-delete-method'
  - `mjr-thingy-lookeruper-add-method'
 
-Keybindings.  While mjr-thingy-lookeruper creates no keybindings, I
-recommend binding the function `mjr-thingy-lookeruper' to "C-c l" --
-i.e. "l" for "Lookup":
+I bind the function `mjr-thingy-lookeruper' to "C-c l" -- i.e. "l" for "Lookup":
 
      (keymap-global-set "C-c l" 'mjr-thingy-lookeruper)
      
