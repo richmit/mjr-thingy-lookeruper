@@ -19,7 +19,7 @@
 ;; TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ;; Author:      Mitch Richling
-;; Version:     1.8
+;; Version:     1.9
 ;; Keywords:    mjr-thingy-lookeruper
 ;; URL:         https://github.com/richmit/mjr-thingy-lookeruper
 
@@ -304,7 +304,7 @@ Variables:
                    (error "mjr-thingy-lookeruper: Unable to locate suitable lookup methods."))
                  (if (null (cdr candidates))
                      (car candidates)
-                     (let ((da-method (if (require 'ido nil :noerror) 
+                     (let ((da-method (if (and (boundp 'ido-everywhere) ido-everywhere)
                                           (ido-completing-read "Lookup Method: " (mapcar #'car candidates) nil t)
                                           (completing-read     "Lookup Method: " (mapcar #'car candidates) nil t))))
                        (assoc da-method candidates #'string-equal)))))
