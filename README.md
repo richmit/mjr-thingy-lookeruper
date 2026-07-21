@@ -39,7 +39,7 @@ i.e. "l" for "Lookup":
 The easiest way to install mjr-thingy-lookeruper is to pull it directly
 from github:
 
-   (package-vc-install (list 'mjr-thingy-lookeruper
-                        :url "https://github.com/richmit/mjr-thingy-lookeruper"
-                        :rev 'newest))
+     (package-vc-install (list 'mjr-thingy-lookeruper
+                          :url "https://github.com/richmit/mjr-thingy-lookeruper"
+                          :rev 'newest))
                         
