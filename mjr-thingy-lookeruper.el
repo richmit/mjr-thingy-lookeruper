@@ -19,7 +19,7 @@
 ;; TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ;; Author:      Mitch Richling
-;; Version:     1.9
+;; Version:     1.11
 ;; Keywords:    mjr-thingy-lookeruper
 ;; URL:         https://github.com/richmit/mjr-thingy-lookeruper
 
@@ -39,62 +39,17 @@
 ;;;###autoload
 (defconst mjr-thingy-lookeruper-built-in-methods
   (list
-   (list :name "man"
-         :desc "Look for a UNIX man page via man (emacs)."
-         :atpt (lambda () (and (thing-at-point-looking-at "\\b\\([a-z0-9_-]+\\)\\b" 20) (match-string 1)))
-         :actn #'man)
-   (list :name "gid"
-         :desc "Lookup a numeric group ID via getent (shell)."
-         :atpt (lambda () (thing-at-point 'number))
-         :actn "getent group %Q")
-   (list :name "gname"
-         :desc "Lookup a group name (gname) via getent (shell)."
-         :atpt (lambda () (and (thing-at-point-looking-at "\\b\\([.a-zA-Z0-9_-]+\\)\\b" 20) (match-string 1)))
-         :actn "getent group %Q")
-   (list :name "uid"
-         :desc "Lookup a numeric user ID via getent (shell)."
-         :atpt (lambda () (thing-at-point 'number))
-         :actn "getent passwd %Q")
-   (list :name "uname"
-         :desc "Look up a user name (uname) with getent (shell)." 
-         :atpt (lambda () (let ((tmp (and (thing-at-point-looking-at "\\b\\([a-zA-Z][a-zA-Z0-9_-]+\\)\\b" 20) (match-string 1))))
-                            (and tmp (cl-find tmp (system-users) :test #'string-equal))))
-         :actn "getent passwd %Q")
-   (list :name "DNS"
-         :desc "Lookup host name via dns-lookup-host (emacs)."
-         :atpt (lambda () (and (thing-at-point-looking-at "\\([.a-zA-Z0-9_-]+\\.\\(com\\|edu\\|org\\|gov\\)\\)\\b" 20) (match-string 1)))
-         :actn #'dns-lookup-host)
-   (list :name "IPv4"
-         :desc "Lookup IPv4 address via dns-lookup-host (emacs)."
-         :atpt (lambda () (and (thing-at-point-looking-at "\\b\\(\\([0-9]+\\)\\.\\([0-9]+\\)\\.\\([0-9]+\\)\\.\\([0-9]+\\)\\)\\b" 20) 
-                               (cl-every (lambda (x) (let ((y (string-to-number (match-string x)))) (and (<= 0 y) (>= 255 y)))) '(2 3 4 5))
-                               (match-string 1)))
-         :actn #'dns-lookup-host)
-   (list :name "file"
-         :desc "Look up file data via fstat.pl or stat (shell)."
-         :atpt (lambda () (and-let* ((raw-fname (ffap-guess-file-name-at-point))
-                                     (          (file-exists-p raw-fname))
-                                     (exp-fname (expand-file-name raw-fname)))))
-         :actn (if-let* ((tmp (locate-file "fstat" exec-path (list ".pl"))))
-                   "fstat.pl '%Q'"
-                 "stat '%Q'"))
-   (list :name "URL"
-         :desc "Hand URL to browser using browse-url (emacs)."
-         :atpt (lambda () (thing-at-point 'url))
-         :actn #'browse-url)
-   (list :name "dictionary"
-         :desc "Look up a word via dictionary.reference.com using browse-url (emacs)"
-         :atpt (lambda () (and (thing-at-point-looking-at "\\b\\([a-zA-Z'-]+\\)\\b" 20) (match-string 1)))
-         :actn (lambda (thingy) (browse-url (concat "https://www.merriam-webster.com/dictionary/" (url-hexify-string thingy) ""))))
-   (list :name "google"
-         :desc "Search via google using browse-url (emacs)"
-         :actn (lambda (thingy) (browse-url (concat "http://google.com/search?q=" (url-hexify-string thingy)))))
+   ;;; These only work with a region so I list them first.
    (list :name "bing"
          :desc "Search via bing using browse-url (emacs)"
          :actn (lambda (thingy) (browse-url (concat "https://www.bing.com/search?q=" (url-hexify-string thingy)))))
+   (list :name "google"
+         :desc "Search via google using browse-url (emacs)"
+         :actn (lambda (thingy) (browse-url (concat "http://google.com/search?q=" (url-hexify-string thingy)))))
    (list :name "ebay"
          :desc "Search via e-bay using browse-url (emacs)"
          :actn (lambda (thingy) (browse-url (concat "https://www.ebay.com/sch/i.html?_nkw=" (url-hexify-string thingy)))))
+   ;;; Mode specific symbol matches
    (list :name "el-symbol"
          :desc "Lookup a lisp symbol in an interactive elisp session or in an elisp source file via describe-symbol (emacs)"
          :mode (list 'lisp-interaction-mode 'emacs-lisp-mode)
@@ -139,31 +94,6 @@
                                                                             (string-remove-suffix "-mode" (symbol-name major-mode)))
                                                                         " "
                                                                         (format "%s" thingy)))))))
-   (list :name "symbol-bing"
-         :desc "Search bing for captured symbol with major-mode name as search context using browse-url (emacs)."
-         :mode (list 'ruby-mode 'perl-mode 'python-mode 'julia-mode 'c++-mode 'f90-mode 'c-mode 'emacs-lisp-mode
-                     'lisp-mode 'fortran-mode 'javascript-mode 'java-mode 'matlab-mode 'octave-mode 'cmake-mode)
-         :atpt #'symbol-at-point
-         :actn (lambda (thingy) (browse-url (concat "https://www.bing.com/search?q="
-                                                    (url-hexify-string (concat
-                                                                        "+\""
-                                                                        (string-remove-suffix "-mode" (symbol-name major-mode))
-                                                                        "\" "
-                                                                        "+\""
-                                                                        (format "%s" thingy)
-                                                                        "\""))))))
-   (list :name "CPP-header"
-         :desc "Lookup a c++ header file via cppreference.com using browse-url (emacs)"
-         :mode (list 'c++-mode)
-         :atpt (lambda () (and (thing-at-point-looking-at "^#include *<\\([^>]+\\)>" 50) (match-string 1)))
-         :actn (lambda (thingy)
-                 (let* ((thingy-str (if (stringp thingy)
-                                        thingy
-                                        (symbol-name thingy)))
-                        (thingy-fix (if (string-suffix-p ".h" thingy-str)
-                                        (concat "c" (string-remove-suffix ".h" thingy-str))
-                                        thingy-str)))
-                   (browse-url (concat "https://en.cppreference.com/w/cpp/header/" (url-hexify-string thingy-fix))))))
    (list :name "julia-symbol"
          :desc "Search for a Julia symbol on docs.julialang.org using browse-url (emacs)"
          :mode (list 'julia-mode)
@@ -179,16 +109,46 @@
          :mode (list 'c++-mode 'c-mode)
          :atpt #'symbol-at-point
          :actn (lambda (thingy) (browse-url (concat "https://cppreference.com/index.php?search=" (url-hexify-string (format "%s" thingy))))))
-   (list :name "C-header"
-         :desc "Lookup a c header file via cppreference.com using browse-url (emacs)"
-         :mode (list 'c-mode)
-         :atpt (lambda () (and (thing-at-point-looking-at "^#include *<\\([^>]+\\)\\.h>" 50) (match-string 1)))
-         :actn (lambda (thingy) (browse-url (concat "https://en.cppreference.com/c/header/" (url-hexify-string (format "%s" thingy))))))
    (list :name "matlab-symbol"
          :desc "Search for a Matlab symbol on https://www.mathworks.com/search using browse-url (emacs)"
          :mode (list 'octave-mode 'matlab-mode)
          :atpt #'symbol-at-point
          :actn (lambda (thingy) (browse-url (concat "https://www.mathworks.com/search/user-center?q=" (url-hexify-string (format "%s" thingy)) "&app=documentation&page=1"))))
+   ;;; List after other "symbol" methods because we probably want to use one of them if they matched
+   (list :name "symbol-bing"
+         :desc "Search bing for captured symbol with major-mode name as search context using browse-url (emacs)."
+         :mode (list 'ruby-mode 'perl-mode 'python-mode 'julia-mode 'c++-mode 'f90-mode 'c-mode 'emacs-lisp-mode
+                     'lisp-interaction-mode 'lisp-mode 'fortran-mode 'javascript-mode 'java-mode 'matlab-mode 
+                     'octave-mode 'cmake-mode)
+         :atpt #'symbol-at-point
+         :actn (lambda (thingy) (browse-url (concat "https://www.bing.com/search?q="
+                                                    (url-hexify-string (concat
+                                                                        "+\""
+                                                                        (let ((tmp (string-remove-suffix "-mode" (symbol-name major-mode))))
+                                                                          (setq tmp (string-replace "f90"              "fortran"    tmp))
+                                                                          (setq tmp (string-replace "lisp-interaction" "emacs lisp" tmp)))
+                                                                        "\" "
+                                                                        "+\""
+                                                                        (format "%s" thingy)
+                                                                        "\""))))))
+   ;; Stuff with super specific match rules, so if they match we probably want to use them.
+   (list :name "C-header"
+         :desc "Lookup a c header file via cppreference.com using browse-url (emacs)"
+         :mode (list 'c-mode)
+         :atpt (lambda () (and (thing-at-point-looking-at "^#include *<\\([^>]+\\)\\.h>" 50) (match-string 1)))
+         :actn (lambda (thingy) (browse-url (concat "https://en.cppreference.com/c/header/" (url-hexify-string (format "%s" thingy))))))
+   (list :name "CPP-header"
+         :desc "Lookup a c++ header file via cppreference.com using browse-url (emacs)"
+         :mode (list 'c++-mode)
+         :atpt (lambda () (and (thing-at-point-looking-at "^#include *<\\([^>]+\\)>" 50) (match-string 1)))
+         :actn (lambda (thingy)
+                 (let* ((thingy-str (if (stringp thingy)
+                                        thingy
+                                        (symbol-name thingy)))
+                        (thingy-fix (if (string-suffix-p ".h" thingy-str)
+                                        (concat "c" (string-remove-suffix ".h" thingy-str))
+                                        thingy-str)))
+                   (browse-url (concat "https://en.cppreference.com/w/cpp/header/" (url-hexify-string thingy-fix))))))
    (list :name "STM32"
          :desc "Search for a STM32/NUCLEO part on st.com using browse-url (emacs)"
          :atpt (lambda () (and (thing-at-point-looking-at "\\b\\(NUCLEO-[A-Z0-9]+\\|STM32[A-Z][A-Z0-9]+\\)\\b" 20) (match-string 1)))
@@ -197,6 +157,55 @@
          :desc "Lookup an ISBN (10 or 13) number on isbnsearch.org using browse-url (emacs)"
          :atpt (lambda () (and (thing-at-point-looking-at "\\b\\([0-9]\\{10\\}\\|[0-9]-[0-9]\\{6\\}-[0-9][0-9]-[0-9]\\|[0-9]\\{13\\}\\|[0-9]\\{3\\}-[0-9]-[0-9]\\{5\\}-[0-9]\\{3\\}-[0-9]\\)\\b" 25) (match-string 1)))
          :actn (lambda (thingy) (browse-url (concat "https://isbnsearch.org/isbn/" (url-hexify-string (replace-regexp-in-string "[^0-9]" "" thingy))))))
+   ;;; Common stuff
+   (list :name "man"
+         :desc "Look for a UNIX man page via man (emacs)."
+         :atpt (lambda () (and (thing-at-point-looking-at "\\b\\([a-z0-9_-]+\\)\\b" 20) (match-string 1)))
+         :actn #'man)
+   (list :name "file"
+         :desc "Look up file data via fstat.pl or stat (shell)."
+         :atpt (lambda () (and-let* ((raw-fname (ffap-guess-file-name-at-point))
+                                     (          (file-exists-p raw-fname))
+                                     (exp-fname (expand-file-name raw-fname)))))
+         :actn (if-let* ((tmp (locate-file "fstat" exec-path (list ".pl"))))
+                   "fstat.pl '%Q'"
+                 "stat '%Q'"))
+   ;;; Less common things
+   (list :name "URL"
+         :desc "Hand URL to browser using browse-url (emacs)."
+         :atpt (lambda () (thing-at-point 'url))
+         :actn #'browse-url)
+   (list :name "dictionary"
+         :desc "Look up a word via dictionary.reference.com using browse-url (emacs)"
+         :atpt (lambda () (and (thing-at-point-looking-at "\\b\\([a-zA-Z'-]+\\)\\b" 20) (match-string 1)))
+         :actn (lambda (thingy) (browse-url (concat "https://www.merriam-webster.com/dictionary/" (url-hexify-string thingy) ""))))
+   (list :name "gid"
+         :desc "Lookup a numeric group ID via getent (shell)."
+         :atpt (lambda () (thing-at-point 'number))
+         :actn "getent group %Q")
+   (list :name "gname"
+         :desc "Lookup a group name (gname) via getent (shell)."
+         :atpt (lambda () (and (thing-at-point-looking-at "\\b\\([.a-zA-Z0-9_-]+\\)\\b" 20) (match-string 1)))
+         :actn "getent group %Q")
+   (list :name "uid"
+         :desc "Lookup a numeric user ID via getent (shell)."
+         :atpt (lambda () (thing-at-point 'number))
+         :actn "getent passwd %Q")
+   (list :name "uname"
+         :desc "Look up a user name (uname) with getent (shell)." 
+         :atpt (lambda () (let ((tmp (and (thing-at-point-looking-at "\\b\\([a-zA-Z][a-zA-Z0-9_-]+\\)\\b" 20) (match-string 1))))
+                            (and tmp (cl-find tmp (system-users) :test #'string-equal))))
+         :actn "getent passwd %Q")
+   (list :name "DNS"
+         :desc "Lookup host name via dns-lookup-host (emacs)."
+         :atpt (lambda () (and (thing-at-point-looking-at "\\([.a-zA-Z0-9_-]+\\.\\(com\\|edu\\|org\\|gov\\)\\)\\b" 20) (match-string 1)))
+         :actn #'dns-lookup-host)
+   (list :name "IPv4"
+         :desc "Lookup IPv4 address via dns-lookup-host (emacs)."
+         :atpt (lambda () (and (thing-at-point-looking-at "\\b\\(\\([0-9]+\\)\\.\\([0-9]+\\)\\.\\([0-9]+\\)\\.\\([0-9]+\\)\\)\\b" 20) 
+                               (cl-every (lambda (x) (let ((y (string-to-number (match-string x)))) (and (<= 0 y) (>= 255 y)))) '(2 3 4 5))
+                               (match-string 1)))
+         :actn #'dns-lookup-host)
    ))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
