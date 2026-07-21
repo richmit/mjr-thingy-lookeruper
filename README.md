@@ -24,10 +24,10 @@ Several example methods are provided in `mjr-thingy-lookeruper-built-in-methods'
  - Books via ISBN
 
 Some utilities related to the variables mentioned above:
-     - `mjr-thingy-lookeruper-get-built-in'
-     - `mjr-thingy-lookeruper-get-method'
-     - `mjr-thingy-lookeruper-delete-method'
-     - `mjr-thingy-lookeruper-add-method'
+ - `mjr-thingy-lookeruper-get-built-in'
+ - `mjr-thingy-lookeruper-get-method'
+ - `mjr-thingy-lookeruper-delete-method'
+ - `mjr-thingy-lookeruper-add-method'
 
 Keybindings.  While mjr-thingy-lookeruper creates no keybindings, I
 recommend binding the function `mjr-thingy-lookeruper' to "C-c l" --
