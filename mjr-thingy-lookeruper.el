@@ -3,7 +3,7 @@
 ;; Copyright (C) 2026-2026 First Last me@mitchr.me
 
 ;; Author:      Mitch Richling
-;; Version:     1.0
+;; Version:     1.1
 ;; Keywords:    mjr-thingy-lookeruper
 ;; URL:         https://github.com/richmit/mjr-thingy-lookeruper
 
@@ -25,7 +25,7 @@
 ;;                               :rev 'newest))
 ;;
 ;; I normally bind C-c l to mjr-thingy-lookeruper like this
-;;      (keymap-global-set "C-c l"     'mjr-thingy-lookeruper))
+;;      (keymap-global-set "C-c l"     'mjr-thingy-lookeruper)
 ;;
 
 ;;; Commentary:
