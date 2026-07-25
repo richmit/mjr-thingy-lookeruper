@@ -1,4 +1,5 @@
-# mjr-thingy-lookeruper
+mjr-thingy-lookeruper
+=====================
 
 The mjr-thingy-lookeruper Emacs package provides an extensible way to
 identify and lookup things in a buffer.  For example, if the cursor is
