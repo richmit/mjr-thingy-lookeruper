@@ -1,4 +1,4 @@
-;; mjr-thingy-lookeruper -*-coding: utf-8 lexical-binding:t; mode:emacs-lisp; fill-column:158 -*-
+;;; mjr-thingy-lookeruper.el --- Look up things -*- lexical-binding:t; coding: utf-8; mode:emacs-lisp; fill-column:158 -*-
 
 ;; Copyright (c) 2026-2026 Mitch Richling <https://www.mitchr.me>.  All rights reserved.
 ;;
@@ -118,7 +118,7 @@
    (list :name "symbol-bing"
          :desc "Search bing for captured symbol with major-mode name as search context using browse-url (emacs)."
          :mode (list 'ruby-mode 'perl-mode 'python-mode 'julia-mode 'c++-mode 'f90-mode 'c-mode 'emacs-lisp-mode
-                     'lisp-interaction-mode 'lisp-mode 'fortran-mode 'javascript-mode 'java-mode 'matlab-mode 
+                     'lisp-interaction-mode 'lisp-mode 'fortran-mode 'javascript-mode 'java-mode 'matlab-mode
                      'octave-mode 'cmake-mode)
          :atpt #'symbol-at-point
          :actn (lambda (thingy) (browse-url (concat "https://www.bing.com/search?q="
@@ -192,7 +192,7 @@
          :atpt (lambda () (thing-at-point 'number))
          :actn "getent passwd %Q")
    (list :name "uname"
-         :desc "Look up a user name (uname) with getent (shell)." 
+         :desc "Look up a user name (uname) with getent (shell)."
          :atpt (lambda () (let ((tmp (and (thing-at-point-looking-at "\\b\\([a-zA-Z][a-zA-Z0-9_-]+\\)\\b" 20) (match-string 1))))
                             (and tmp (cl-find tmp (system-users) :test #'string-equal))))
          :actn "getent passwd %Q")
@@ -202,7 +202,7 @@
          :actn #'dns-lookup-host)
    (list :name "IPv4"
          :desc "Lookup IPv4 address via dns-lookup-host (emacs)."
-         :atpt (lambda () (and (thing-at-point-looking-at "\\b\\(\\([0-9]+\\)\\.\\([0-9]+\\)\\.\\([0-9]+\\)\\.\\([0-9]+\\)\\)\\b" 20) 
+         :atpt (lambda () (and (thing-at-point-looking-at "\\b\\(\\([0-9]+\\)\\.\\([0-9]+\\)\\.\\([0-9]+\\)\\.\\([0-9]+\\)\\)\\b" 20)
                                (cl-every (lambda (x) (let ((y (string-to-number (match-string x)))) (and (<= 0 y) (>= 255 y)))) '(2 3 4 5))
                                (match-string 1)))
          :actn #'dns-lookup-host)
@@ -218,18 +218,18 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;###autoload
 (defcustom mjr-thingy-lookeruper-methods mjr-thingy-lookeruper-built-in-methods
-  "Lookup methods available to mjr-thingy-lookeruper.
-A list lookup methods for mjr-thingy-lookeruper.  Each entry is a property list:
- - :name -- A string with the name of the method (Required) 
+  "Lookup methods available to `mjr-thingy-lookeruper'.
+A list lookup methods for `mjr-thingy-lookeruper'.  Each entry is a property list:
+ - :name -- A string with the name of the method (Required)
  * :desc -- A string with a description of the method (Optional)
- * :pred -- A predicate function that must be evaluate to non-nil for a method to be used. (Optional)
+ * :pred -- A predicate function that must be evaluate to non-nil for a method to be used.  (Optional)
             If missing or nil, the method may be used.
             Frequently used to make sure necessary code has been loaded before use.
- * :mode -- A list of major mode symbols used to a buffer's major mode. (Optional)
+ * :mode -- A list of major mode symbols used to a buffer's major mode.  (Optional)
             If missing or nil, the method may be used with buffers of any mode
  * :atpt -- A function used to thingy (usually a string but not necessarily) from buffer.  (Optional)
             If missing or nil, the method may only be used with an active region.
- * :actn -- A function or shell command string used to perform the lookup. (Required)
+ * :actn -- A function or shell command string used to perform the lookup.  (Required)
             - In shell command strings %U is replaced with the URL hexified thingy, and %Q will be replaced with the thingy.
 The functions `mjr-thingy-lookeruper-get-built-in', `mjr-thingy-lookeruper-add-method', and `mjr-thingy-lookeruper-delete-method'
 may be helpfull to manage this list."
@@ -238,31 +238,35 @@ may be helpfull to manage this list."
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;###autoload
-(defun mjr-thingy-lookeruper-get-built-in (method-name) 
+(defun mjr-thingy-lookeruper-get-built-in (method-name)
+  "Return the built-in method by name.
+Built-In methods are stored in `mjr-thingy-lookeruper-built-in-methods'."
   (cl-find-if (lambda (x) (string-equal method-name (plist-get x :name))) mjr-thingy-lookeruper-built-in-methods))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;###autoload
-(defun mjr-thingy-lookeruper-get-method (method-name) 
+(defun mjr-thingy-lookeruper-get-method (method-name)
+  "Return the method by name.
+Built-In methods are stored in `mjr-thingy-lookeruper-methods'."
   (cl-find-if (lambda (x) (string-equal method-name (plist-get x :name))) mjr-thingy-lookeruper-methods))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;###autoload
-(defun mjr-thingy-lookeruper-add-method (method-properties) 
+(defun mjr-thingy-lookeruper-add-method (method-properties)
   "Add a new method to mjr-thingy-lookeruper-methods.  Error if a method already exists with the same :NAME."
   (when (not (plistp method-properties))
-    (error "mjr-thingy-lookeruper-add-method: method is not a valid property list."))
+    (error "mjr-thingy-lookeruper-add-method: Method is not a valid property list"))
   (when (not (plist-get method-properties :name))
-    (error "mjr-thingy-lookeruper-add-method: peoperty :name must be present and non-nil."))
+    (error "mjr-thingy-lookeruper-add-method: Peoperty :name must be present and non-nil"))
   (when (not (plist-get method-properties :actn))
-    (error "mjr-thingy-lookeruper-add-method: peoperty :actn must be present and non-nil."))
+    (error "mjr-thingy-lookeruper-add-method: Peoperty :actn must be present and non-nil"))
   (when (mjr-thingy-lookeruper-get-method method-name)
-    (error "mjr-thingy-lookeruper-add-method: peoperty method with the same name is already on mjr-thingy-lookeruper-methods list!"))
+    (error "mjr-thingy-lookeruper-add-method: Peoperty method with the same name is already on mjr-thingy-lookeruper-methods list!"))
   (add-to-list mjr-thingy-lookeruper-methods method-properties))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;###autoload
-(defun mjr-thingy-lookeruper-delete-method (method-name) 
+(defun mjr-thingy-lookeruper-delete-method (method-name)
   "Delete method with given name from mjr-thingy-lookeruper-methods, and return properties of deleted method.  Return nil if nothing was deleted."
   (let ((method-properties (mjr-thingy-lookeruper-get-method method-name)))
     (setq mjr-thingy-lookeruper-methods
@@ -285,21 +289,21 @@ Interactive use (while not the true order of events in the code, this step-wise 
     - Multiple eligible queries .... Query the user to choose a method.
     - No eligible queries .......... Error
 Non-Interactive use: Lookup THE-THINGY via THE-METHOD.
-  - THE-METHOD is the :NAME, a string, of a method stored in mjr-thingy-lookeruper-methods.  
+  - THE-METHOD is the :NAME, a string, of a method stored in `mjr-thingy-lookeruper-methods'.
   - THE-THINGY is an object, usually a string, to look up with the named method.
-  - If THE-METHOD is not found on mjr-thingy-lookeruper-methods, then error.
+  - If THE-METHOD is not found on `mjr-thingy-lookeruper-methods', then error.
 Results:
- - Methods that use a shell command place the results in the buffer *thingy-lookup-results*.  
- - Methods that use a lisp function
+ - Methods that use a shell command place the results in the buffer *thingy-lookup-results*.
+ - Methods that use a Lisp function
    - If the function returns a string, the string is printed as an Emacs message.
-   - Many lisp function lookup methods may provide a special environment for displaying the results.
+   - Many Lisp function lookup methods may provide a special environment for displaying the results.
 Variables:
- - mjr-thingy-lookeruper-methods .. Describes the methods for lookup.  Examples include uname, gname, uid, gid, host name, dictionary word, and Google search."
+ - `mjr-thingy-lookeruper-methods' .. Describes the methods for lookup.  Examples include uname, gname, uid, gid, host name, dictionary word, and Google search."
   (interactive (let* ((region-string (and transient-mark-mode (region-active-p) (mark) (buffer-substring-no-properties (region-beginning) (region-end))))
                      (candidates    (cl-loop for cur-method-properties in mjr-thingy-lookeruper-methods
                                              for thingy = (and (or current-prefix-arg
-                                                                   (let ((cur-method-mode-list (plist-get cur-method-properties :mode)))                        
-                                                                     (or (null cur-method-mode-list) 
+                                                                   (let ((cur-method-mode-list (plist-get cur-method-properties :mode)))
+                                                                     (or (null cur-method-mode-list)
                                                                          (member major-mode cur-method-mode-list))))
                                                                (let ((cur-method-need (plist-get cur-method-properties :pred)))
                                                                  (or (null cur-method-need)
@@ -310,7 +314,7 @@ Variables:
                                              when thingy
                                              collect (list (plist-get cur-method-properties :name) thingy))))
                  (unless candidates
-                   (error "mjr-thingy-lookeruper: Unable to locate suitable lookup methods."))
+                   (error "mjr-thingy-lookeruper: Unable to locate suitable lookup methods"))
                  (if (null (cdr candidates))
                      (car candidates)
                      (let ((da-method (if (and (boundp 'ido-everywhere) ido-everywhere)
@@ -346,5 +350,5 @@ Variables:
 
 (provide 'mjr-thingy-lookeruper)
 
-;;; filename ends here
+;;; mjr-thingy-lookeruper.el ends here
 
