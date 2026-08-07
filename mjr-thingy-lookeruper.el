@@ -271,18 +271,12 @@ A list lookup methods for `mjr-thingy-lookeruper'.  Each entry is a property lis
             - In shell command strings %U is replaced with the URL hexified thingy, and %Q will be replaced with the thingy.
 The functions `mjr-thingy-lookeruper-get-built-in', `mjr-thingy-lookeruper-add-method', and `mjr-thingy-lookeruper-delete-method'
 may be helpfull to manage this list."
-  :type '(plist :key-type (choice (const :name)
-                                  (const :desc)
-                                  (const :pred)
-                                  (const :mode)
-                                  (const :atpt)
-                                  (const :actn)))
-  :options '((:name string)
-             (:desc string)
-             (:pred function)
-             (:mode (repeat symbol))
-             (:atpt function)
-             (:actn function))
+  :type '(set (plist :key-type (choice (const :name)
+                                       (const :desc)
+                                       (const :pred)
+                                       (const :mode)
+                                       (const :atpt)
+                                       (const :actn))))
   :group 'mjr-thingy-lookeruper)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -398,6 +392,8 @@ Variables:
                 (message "Lookup result: %s" res)))))))
 
 (provide 'mjr-thingy-lookeruper)
+
+;;(mjr-install-mjr-packages :reinstall :git 'mjr-thingy-lookeruper)
 
 ;;; mjr-thingy-lookeruper.el ends here
 
