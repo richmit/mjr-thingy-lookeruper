@@ -19,7 +19,7 @@
 ;; TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ;; Author:      Mitch Richling
-;; Version:     1.17
+;; Version:     1.18
 ;; Keywords:    mjr-thingy-lookeruper
 ;; URL:         https://github.com/richmit/mjr-thingy-lookeruper
 
@@ -255,7 +255,7 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;###autoload
-(defcustom mjr-thingy-lookeruper-methods nil ;;mjr-thingy-lookeruper-built-in-methods
+(defcustom mjr-thingy-lookeruper-methods mjr-thingy-lookeruper-built-in-methods
   "Lookup methods available to `mjr-thingy-lookeruper'.
 A list lookup methods for `mjr-thingy-lookeruper'.  Each entry is a property list:
  - :name -- A string with the name of the method (Required)
@@ -271,12 +271,7 @@ A list lookup methods for `mjr-thingy-lookeruper'.  Each entry is a property lis
             - In shell command strings %U is replaced with the URL hexified thingy, and %Q will be replaced with the thingy.
 The functions `mjr-thingy-lookeruper-get-built-in', `mjr-thingy-lookeruper-add-method', and `mjr-thingy-lookeruper-delete-method'
 may be helpfull to manage this list."
-  :type '(set (plist :key-type (choice (const :name)
-                                       (const :desc)
-                                       (const :pred)
-                                       (const :mode)
-                                       (const :atpt)
-                                       (const :actn))))
+  :type '(set (plist))
   :group 'mjr-thingy-lookeruper)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
