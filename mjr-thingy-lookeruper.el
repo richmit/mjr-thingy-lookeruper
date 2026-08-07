@@ -19,7 +19,7 @@
 ;; TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ;; Author:      Mitch Richling
-;; Version:     1.16
+;; Version:     1.17
 ;; Keywords:    mjr-thingy-lookeruper
 ;; URL:         https://github.com/richmit/mjr-thingy-lookeruper
 
@@ -255,7 +255,7 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;###autoload
-(defcustom mjr-thingy-lookeruper-methods mjr-thingy-lookeruper-built-in-methods
+(defcustom mjr-thingy-lookeruper-methods nil ;;mjr-thingy-lookeruper-built-in-methods
   "Lookup methods available to `mjr-thingy-lookeruper'.
 A list lookup methods for `mjr-thingy-lookeruper'.  Each entry is a property list:
  - :name -- A string with the name of the method (Required)
