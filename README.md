@@ -1,7 +1,9 @@
 <!-- :shell>>> ~/core/codeBits/bin/emacs_package_com_to_md.rb mjr-thingy-lookeruper.el -->
-# Looking up stuff in Emacs `mjr-thingy-lookeruper`
+# Looking up stuff in Emacs
 
 See the README: https://github.com/richmit/mjr-thingy-lookeruper/
+
+## Introduction
 
 The mjr-thingy-lookeruper Emacs package provides an extensible way to identify and lookup things in a buffer.  For example, if the cursor is near an ISBN
 number then mjr-thingy-lookeruper can recognize the ISBN number and look the book up.
@@ -34,7 +36,7 @@ Some utilities related to the variables mentioned above:
  - `mjr-thingy-lookeruper-delete-method`
  - `mjr-thingy-lookeruper-add-method`
   
-# Installing
+## Installing
 
 The easiest way to install mjr-thingy-lookeruper is to pull it directly from github:
 
