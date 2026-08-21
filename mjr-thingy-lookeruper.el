@@ -19,13 +19,15 @@
 ;; TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ;; Author:      Mitch Richling
-;; Version:     1.25
+;; Version:     1.26
 ;; Keywords:    mjr-thingy-lookeruper
 ;; URL:         https://github.com/richmit/mjr-thingy-lookeruper
 
 ;; This file is not part of Emacs
 
 ;;; Commentary:
+;;
+;; * Looking up stuff in Emacs `mjr-thingy-lookeruper'
 ;;
 ;; See the README: https://github.com/richmit/mjr-thingy-lookeruper/
 ;;
@@ -60,6 +62,8 @@
 ;;  - `mjr-thingy-lookeruper-delete-method'
 ;;  - `mjr-thingy-lookeruper-add-method'
 ;;   
+;; # Installing
+;;
 ;; The easiest way to install mjr-thingy-lookeruper is to pull it directly from github:
 ;;
 ;;      (package-vc-install (list 'mjr-thingy-lookeruper
