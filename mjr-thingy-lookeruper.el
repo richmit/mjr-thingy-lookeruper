@@ -19,7 +19,7 @@
 ;; TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ;; Author:      Mitch Richling
-;; Version:     1.30
+;; Version:     1.31
 ;; Keywords:    mjr-thingy-lookeruper
 ;; URL:         https://github.com/richmit/mjr-thingy-lookeruper
 
@@ -397,7 +397,7 @@ Variables:
                                                                             (null cur-method-optp)
                                                                             (if (listp cur-method-optp)
                                                                                 (member major-mode cur-method-optp)
-                                                                                (function cur-method-optp)))))                                                
+                                                                                (funcall cur-method-optp)))))                                                
                                                              (let ((pot-thingy (or region-string ;; Get potential thingy from buffer
                                                                                    (when-let* ((cur-method-tap (plist-get cur-method-properties :atpt)))
                                                                                      (funcall cur-method-tap)))))
@@ -406,7 +406,7 @@ Variables:
                                                                          (or (null cur-method-tokp)  ;; Check our potential thingy with :tokp
                                                                              (if (listp cur-method-tokp)
                                                                                  (string-match-p cur-method-tokp (format "%s" pot-thingy))
-                                                                                 (function cur-method-tokp pot-thingy))))
+                                                                                 (funcall cur-method-tokp pot-thingy))))
                                                                    pot-thingy))))
                                               when thingy
                                               collect (list (plist-get cur-method-properties :name) thingy))))
