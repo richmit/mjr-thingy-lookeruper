@@ -19,7 +19,7 @@
 ;; TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ;; Author:      Mitch Richling
-;; Version:     1.28
+;; Version:     1.30
 ;; Keywords:    mjr-thingy-lookeruper
 ;; URL:         https://github.com/richmit/mjr-thingy-lookeruper
 
@@ -98,28 +98,29 @@
     ;; Mode specific symbol matches
     (list :name "el-symbol"
           :desc "Lookup a lisp symbol in an interactive elisp session or in an elisp source file via describe-symbol (emacs)"
-          :mode (list 'lisp-interaction-mode 'emacs-lisp-mode)
+          :optp (list 'lisp-interaction-mode 'emacs-lisp-mode)
           :atpt #'symbol-at-point
           :actn (lambda (thingy) (describe-symbol (if (stringp thingy)
                                                       (intern-soft thingy)
                                                       thingy))))
     (list :name "R-symbol"
           :desc "Lookup a symbol in an R session or R source code file via ess-help (emacs)"
-          :mode (list 'inferior-ess-mode 'ess-mode 'ess-r-mode)
+          :optp (list 'inferior-ess-mode 'ess-mode 'ess-r-mode)
+          :reqp (lambda () (cl-every #'fboundp '(ess-help ess-symbol-at-point)))
           :atpt #'ess-symbol-at-point
           :actn (lambda (thingy) (ess-help (format "%s" thingy))))
     (list :name "cl-symbol(hyperspec)"
           :desc "Lookup a symbol in an interactive SLIME REPL or common lisp buffer using the hyperspec"
-          :mode (list 'slime-repl-mode 'lisp-mode)
+          :optp (list 'slime-repl-mode 'lisp-mode)
+          :reqp (lambda () (cl-every #'fboundp '(hyperspec-lookup)))
           :atpt #'symbol-at-point
-          :actn (lambda (thingy) (hyperspec-lookup (symbol-name thingy))))
+          :actn (lambda (thingy) (hyperspec-lookup (format "%s" thingy))))
     (list :name "cl-symbol(slime)"
           :desc "Lookup a symbol in an interactive SLIME REPL or common lisp buffer using slime-describe-symbol"
-          :pred (lambda () (and (provide 'slime)
-                                (boundp 'slime-net-processes)                ;; List of lisp connections
+          :reqp (lambda () (and (boundp 'slime-net-processes)                ;; List of lisp connections
                                 (boundp 'slime-describe-symbol)              ;; Needed to lookup symbol
                                 (not (zerop (length slime-net-processes))))) ;; Need a connected lisp
-          :mode (list 'slime-repl-mode 'lisp-mode)
+          :optp (list 'slime-repl-mode 'lisp-mode)
           :atpt (lambda () (when-let* ((sym-thingy (symbol-at-point))
                                        (str-thingy (substring-no-properties (symbol-name sym-thingy))))
                              (if (string-match "^[:']" str-thingy)
@@ -128,7 +129,7 @@
           :actn (lambda (thingy) (slime-describe-symbol thingy)))
     (list :name "symbol(devdocs.io)"
           :desc "Lookup a symbol via devdocs.io for ruby, perl, & python buffers using browse-url (emacs)"
-          :mode (list 'ruby-mode 'perl-mode 'python-mode 'julia-mode 'cmake-mode)
+          :optp (list 'ruby-mode 'perl-mode 'python-mode 'julia-mode 'cmake-mode)
           :atpt #'symbol-at-point
           :actn (lambda (thingy) (browse-url (concat "http://devdocs.io/#q="
                                                      (url-hexify-string (concat
@@ -142,28 +143,28 @@
                                                                          (format "%s" thingy)))))))
     (list :name "julia-symbol"
           :desc "Search for a Julia symbol on docs.julialang.org using browse-url (emacs)"
-          :mode (list 'julia-mode)
+          :optp (list 'julia-mode)
           :atpt #'symbol-at-point
           :actn (lambda (thingy) (browse-url (concat "https://docs.julialang.org/en/v1.12/?q=" (url-hexify-string (format "%s" thingy))))))
     (list :name "cmake-symbol"
           :desc "Lookup a symbol via cmake.org using browse-url (emacs)"
-          :mode (list 'cmake-mode)
+          :optp (list 'cmake-mode)
           :atpt #'symbol-at-point
           :actn (lambda (thingy) (browse-url (concat "https://cmake.org/cmake/help/latest/search.html?q=" (url-hexify-string (format "%s" thingy))))))
     (list :name "C/CPP-symbol"
           :desc "Search for a c/c++ symbol on cppreference.com using browse-url"
-          :mode (list 'c++-mode 'c-mode)
+          :optp (list 'c++-mode 'c-mode)
           :atpt #'symbol-at-point
           :actn (lambda (thingy) (browse-url (concat "https://cppreference.com/index.php?search=" (url-hexify-string (format "%s" thingy))))))
     (list :name "matlab-symbol"
           :desc "Search for a Matlab symbol on https://www.mathworks.com/search using browse-url (emacs)"
-          :mode (list 'octave-mode 'matlab-mode)
+          :optp (list 'octave-mode 'matlab-mode)
           :atpt #'symbol-at-point
           :actn (lambda (thingy) (browse-url (concat "https://www.mathworks.com/search/user-center?q=" (url-hexify-string (format "%s" thingy)) "&app=documentation&page=1"))))
-   ;;; List after other "symbol" methods because we probably want to use one of them if they matched
+    ;; List after other "symbol" methods because we probably want to use one of them if they matched
     (list :name "symbol-bing"
           :desc "Search bing for captured symbol with major-mode name as search context using browse-url (emacs)."
-          :mode (list 'ruby-mode 'perl-mode 'python-mode 'julia-mode 'c++-mode 'f90-mode 'c-mode 'emacs-lisp-mode
+          :optp (list 'ruby-mode 'perl-mode 'python-mode 'julia-mode 'c++-mode 'f90-mode 'c-mode 'emacs-lisp-mode
                       'lisp-interaction-mode 'lisp-mode 'fortran-mode 'javascript-mode 'java-mode 'matlab-mode
                       'octave-mode 'cmake-mode)
           :atpt #'symbol-at-point
@@ -180,12 +181,12 @@
     ;; Stuff with super specific match rules, so if they match we probably want to use them.
     (list :name "C-header"
           :desc "Lookup a c header file via cppreference.com using browse-url (emacs)"
-          :mode (list 'c-mode)
+          :optp (list 'c-mode)
           :atpt (lambda () (and (thing-at-point-looking-at "^#include *<\\([^>]+\\)\\.h>" 50) (match-string 1)))
           :actn (lambda (thingy) (browse-url (concat "https://en.cppreference.com/c/header/" (url-hexify-string (format "%s" thingy))))))
     (list :name "CPP-header"
           :desc "Lookup a c++ header file via cppreference.com using browse-url (emacs)"
-          :mode (list 'c++-mode)
+          :optp (list 'c++-mode)
           :atpt (lambda () (and (thing-at-point-looking-at "^#include *<\\([^>]+\\)>" 50) (match-string 1)))
           :actn (lambda (thingy)
                   (let* ((thingy-str (if (stringp thingy)
@@ -225,33 +226,39 @@
           :desc "Look up a word via dictionary.reference.com using browse-url (emacs)"
           :atpt (lambda () (and (thing-at-point-looking-at "\\b\\([a-zA-Z'-]+\\)\\b" 20) (match-string 1)))
           :actn (lambda (thingy) (browse-url (concat "https://www.merriam-webster.com/dictionary/" (url-hexify-string thingy) ""))))
-    (list :name "gid"
-          :desc "Lookup a numeric group ID via getent (shell)."
-          :atpt (lambda () (thing-at-point 'number))
-          :actn "getent group %Q")
-    (list :name "gname"
-          :desc "Lookup a group name (gname) via getent (shell)."
-          :atpt (lambda () (and (thing-at-point-looking-at "\\b\\([.a-zA-Z0-9_-]+\\)\\b" 20) (match-string 1)))
-          :actn "getent group %Q")
-    (list :name "uid"
-          :desc "Lookup a numeric user ID via getent (shell)."
-          :atpt (lambda () (thing-at-point 'number))
-          :actn "getent passwd %Q")
+    (when (executable-find "getent")
+      (list :name "gid"
+            :desc "Lookup a numeric group ID via getent (shell)."
+            :atpt (lambda () (thing-at-point 'number))
+            :actn "getent group %Q"))
+    (when (executable-find "getent")
+      (list :name "gname"
+            :desc "Lookup a group name (gname) via getent (shell)."
+            :atpt (lambda () (and (thing-at-point-looking-at "\\b\\([.a-zA-Z0-9_-]+\\)\\b" 20) (match-string 1)))
+            :actn "getent group %Q"))
+    (when (executable-find "getent")
+      (list :name "uid"
+            :desc "Lookup a numeric user ID via getent (shell)."
+            :atpt (lambda () (thing-at-point 'number))
+            :tokp "\\`[1-9][0-9]*\\'"
+            :actn "getent passwd %Q"))
+    (when (executable-find "getent")
+      (list :name "uname"
+            :desc "Look up a user name (uname) with getent (shell)."
+            :atpt (lambda () (let ((tmp (and (thing-at-point-looking-at "\\b\\([a-zA-Z][a-zA-Z0-9_-]+\\)\\b" 20) (match-string 1))))
+                               (and tmp (cl-find tmp (system-users) :test #'string-equal))))
+            :actn "getent passwd %Q"))
     (when (and (eq system-type 'windows-nt) (executable-find "PowerShell"))
       (list :name "win-uid"
             :desc "Lookup a windows SID for user (PowerShell)."
             :atpt (lambda () (and (thing-at-point-looking-at "\\bS-1\\(-[0-9]+\\)\\b" 100) (match-string 0)))
+            :qokp (lambda (q) (string-match-p "\\`S-1\\(-[0-9]+\\)\\'" q))
             :actn "PowerShell -Command 'Get-LocalUser -SID %Q | Format-List'"))
     (when (and (eq system-type 'windows-nt) (executable-find "PowerShell"))
       (list :name "win-uname"
             :desc "Lookup a windows user name (PowerShell)."
             :atpt (lambda () (and (thing-at-point-looking-at "\\b\\([a-zA-Z][a-zA-Z0-9_-]+\\)\\b" 40) (match-string 1)))
             :actn "PowerShell -Command 'Get-LocalUser -Name %Q | Format-List'"))
-    (list :name "uname"
-          :desc "Look up a user name (uname) with getent (shell)."
-          :atpt (lambda () (let ((tmp (and (thing-at-point-looking-at "\\b\\([a-zA-Z][a-zA-Z0-9_-]+\\)\\b" 20) (match-string 1))))
-                             (and tmp (cl-find tmp (system-users) :test #'string-equal))))
-          :actn "getent passwd %Q")
     (list :name "DNS"
           :desc "Lookup host name via dns-lookup-host (emacs)."
           :atpt (lambda () (and (thing-at-point-looking-at "\\([.a-zA-Z0-9_-]+\\.\\(com\\|edu\\|org\\|gov\\)\\)\\b" 20) (match-string 1)))
@@ -281,6 +288,14 @@ A list lookup methods for `mjr-thingy-lookeruper'.  Each entry is a property lis
  * :pred -- A predicate function that must be evaluate to non-nil for a method to be used.  (Optional)
             If missing or nil, the method may be used.
             Frequently used to make sure necessary code has been loaded before use.
+
+ * :reqp -- Predicate function checking runtime requirements for method.   
+ * :optp -- Predicate function checking runtime suggestions for method.  Suppressed with prefix argument.
+            This may be a list of mode symbols in which case the buffer `major-mode' must be on this list
+ * :tokp -- Predicate function checking the thing for validity
+            This can be a a STRING in which case the thingy is checked by `string-match-p' with :totp as the regex.
+
+
  * :mode -- A list of major mode symbols used to a buffer's major mode.  (Optional)
             If missing or nil, the method may be used with buffers of any mode
  * :atpt -- A function used to thingy (usually a string but not necessarily) from buffer.  (Optional)
@@ -345,9 +360,15 @@ If METHOD-PROPERTIES is non-NIL, then an error occurs if METHOD-PROPERTIES:
 (defun mjr-thingy-lookeruper (the-method the-thingy)
   "Extensible looker upper of thingys at the point or in the active region.
 Interactive use (while not the true order of events in the code, this step-wise description is logically equivalent and easier to understand):
-  Step 1: Construct a list of methods that are eligible to use based on context of the point.
+
+  Step 1: Filter the list of of eligible methods based on the :reqp predicate
+  Step 2: Filter the list of of eligible methods based on the :optp predicate unless a prefix argument was provided
+  Step 3: Filter the list of methods that are eligible to use based on context of the point.
     - If the region is not active .. Each method's tap function is used to determine if the method is eligible for execution and to extract the thingy.
     - If the region is active ...... All methods are considered eligible for execution with the contents of the active region used as the thingy.
+  Step 4: Filter the list of of eligible methods based on the :qokp predicate
+
+
   Step 2: Filter the list of eligible methods based on the buffer mode
     - Without a prefix argument .... Only consider methods that match the buffer mode
     - With a prefix argument ....... Ignore the buffer mode
@@ -367,19 +388,28 @@ Results:
 Variables:
  - `mjr-thingy-lookeruper-methods' .. Defines lookup methods.  Examples include uname, gname, uid, gid, host name, dictionary word, and Google search."
   (interactive (let* ((region-string (and transient-mark-mode (region-active-p) (mark) (buffer-substring-no-properties (region-beginning) (region-end))))
-                     (candidates    (cl-loop for cur-method-properties in mjr-thingy-lookeruper-methods
-                                             for thingy = (and (or current-prefix-arg
-                                                                   (let ((cur-method-mode-list (plist-get cur-method-properties :mode)))
-                                                                     (or (null cur-method-mode-list)
-                                                                         (member major-mode cur-method-mode-list))))
-                                                               (let ((cur-method-need (plist-get cur-method-properties :pred)))
-                                                                 (or (null cur-method-need)
-                                                                     (function cur-method-need)))
-                                                               (or region-string
-                                                                   (when-let* ((cur-method-tap (plist-get cur-method-properties :atpt)))
-                                                                     (funcall cur-method-tap))))
-                                             when thingy
-                                             collect (list (plist-get cur-method-properties :name) thingy))))
+                      (candidates    (cl-loop for cur-method-properties in mjr-thingy-lookeruper-methods
+                                              for thingy = (when (let ((cur-method-reqp (plist-get cur-method-properties :reqp))
+                                                                       (cur-method-optp (plist-get cur-method-properties :optp)))
+                                                                   (and (or (null cur-method-reqp)       ;; Check :reqp
+                                                                            (function cur-method-reqp))
+                                                                        (or current-prefix-arg           ;; Check :optp
+                                                                            (null cur-method-optp)
+                                                                            (if (listp cur-method-optp)
+                                                                                (member major-mode cur-method-optp)
+                                                                                (function cur-method-optp)))))                                                
+                                                             (let ((pot-thingy (or region-string ;; Get potential thingy from buffer
+                                                                                   (when-let* ((cur-method-tap (plist-get cur-method-properties :atpt)))
+                                                                                     (funcall cur-method-tap)))))
+                                                               (when pot-thingy ;; We got something from the buffer
+                                                                 (when (let ((cur-method-tokp (plist-get cur-method-properties :tokp)))
+                                                                         (or (null cur-method-tokp)  ;; Check our potential thingy with :tokp
+                                                                             (if (listp cur-method-tokp)
+                                                                                 (string-match-p cur-method-tokp (format "%s" pot-thingy))
+                                                                                 (function cur-method-tokp pot-thingy))))
+                                                                   pot-thingy))))
+                                              when thingy
+                                              collect (list (plist-get cur-method-properties :name) thingy))))
                  (unless candidates
                    (error "mjr-thingy-lookeruper: Unable to locate suitable lookup methods"))
                  (if (null (cdr candidates))
