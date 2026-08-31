@@ -19,7 +19,7 @@
 ;; TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ;; Author:      Mitch Richling
-;; Version:     1.31
+;; Version:     1.32
 ;; Keywords:    mjr-thingy-lookeruper
 ;; URL:         https://github.com/richmit/mjr-thingy-lookeruper
 
@@ -404,7 +404,7 @@ Variables:
                                                                (when pot-thingy ;; We got something from the buffer
                                                                  (when (let ((cur-method-tokp (plist-get cur-method-properties :tokp)))
                                                                          (or (null cur-method-tokp)  ;; Check our potential thingy with :tokp
-                                                                             (if (listp cur-method-tokp)
+                                                                             (if (stringp cur-method-tokp)
                                                                                  (string-match-p cur-method-tokp (format "%s" pot-thingy))
                                                                                  (funcall cur-method-tokp pot-thingy))))
                                                                    pot-thingy))))
