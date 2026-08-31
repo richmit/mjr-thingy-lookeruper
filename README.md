@@ -16,6 +16,7 @@ Several example lookup methods are provided in variable `mjr-thingy-lookeruper-b
 
   - UNIX man pages
   - Operating group IDs, group names, user IDs, user names
+  - Windows user name and user SID
   - DNS queries
   - Dictionary words
   - Data about files

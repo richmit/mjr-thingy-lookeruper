@@ -19,7 +19,7 @@
 ;; TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ;; Author:      Mitch Richling
-;; Version:     1.32
+;; Version:     1.33
 ;; Keywords:    mjr-thingy-lookeruper
 ;; URL:         https://github.com/richmit/mjr-thingy-lookeruper
 
@@ -44,6 +44,7 @@
 ;;
 ;;   - UNIX man pages
 ;;   - Operating group IDs, group names, user IDs, user names
+;;   - Windows user name and user SID
 ;;   - DNS queries
 ;;   - Dictionary words
 ;;   - Data about files
@@ -230,6 +231,7 @@
       (list :name "gid"
             :desc "Lookup a numeric group ID via getent (shell)."
             :atpt (lambda () (thing-at-point 'number))
+            :tokp "\\`[1-9][0-9]*\\'"
             :actn "getent group %Q"))
     (when (executable-find "getent")
       (list :name "gname"
@@ -251,13 +253,15 @@
     (when (and (eq system-type 'windows-nt) (executable-find "PowerShell"))
       (list :name "win-uid"
             :desc "Lookup a windows SID for user (PowerShell)."
-            :atpt (lambda () (and (thing-at-point-looking-at "\\bS-1\\(-[0-9]+\\)\\b" 100) (match-string 0)))
+            :atpt (lambda () (and (thing-at-point-looking-at "\\b[sS]-1\\(-[0-9]+\\)+\\b" 100) (match-string 0)))
+            :tokp "\\`[sS]-1\\(-[0-9]+\\)+\\'"
             :qokp (lambda (q) (string-match-p "\\`S-1\\(-[0-9]+\\)\\'" q))
             :actn "PowerShell -Command 'Get-LocalUser -SID %Q | Format-List'"))
     (when (and (eq system-type 'windows-nt) (executable-find "PowerShell"))
       (list :name "win-uname"
             :desc "Lookup a windows user name (PowerShell)."
-            :atpt (lambda () (and (thing-at-point-looking-at "\\b\\([a-zA-Z][a-zA-Z0-9_-]+\\)\\b" 40) (match-string 1)))
+            :atpt (lambda () (and (thing-at-point-looking-at "\\b\\([^]\\\\/:;|=,+*?<>@[:space:]\n\r[]+\\)\\b" 40) (match-string 1)))
+            :tokp "\\`[^]\\\\/:;|=,+*?<>@[:space:]\n\r[]+\\'"
             :actn "PowerShell -Command 'Get-LocalUser -Name %Q | Format-List'"))
     (list :name "DNS"
           :desc "Lookup host name via dns-lookup-host (emacs)."
@@ -359,20 +363,15 @@ If METHOD-PROPERTIES is non-NIL, then an error occurs if METHOD-PROPERTIES:
 ;;;###autoload
 (defun mjr-thingy-lookeruper (the-method the-thingy)
   "Extensible looker upper of thingys at the point or in the active region.
-Interactive use (while not the true order of events in the code, this step-wise description is logically equivalent and easier to understand):
 
+Interactive use (while not the true order of events in the code, this step-wise description is logically equivalent and easier to understand):
   Step 1: Filter the list of of eligible methods based on the :reqp predicate
-  Step 2: Filter the list of of eligible methods based on the :optp predicate unless a prefix argument was provided
+  Step 2: If no prefix argument is provided, then filter the list of of eligible methods based on the :optp predicate 
   Step 3: Filter the list of methods that are eligible to use based on context of the point.
     - If the region is not active .. Each method's tap function is used to determine if the method is eligible for execution and to extract the thingy.
     - If the region is active ...... All methods are considered eligible for execution with the contents of the active region used as the thingy.
   Step 4: Filter the list of of eligible methods based on the :qokp predicate
-
-
-  Step 2: Filter the list of eligible methods based on the buffer mode
-    - Without a prefix argument .... Only consider methods that match the buffer mode
-    - With a prefix argument ....... Ignore the buffer mode
-  Step 3: Query the user
+  Step 5: Query the user
     - Only one eligible query ...... Use that method
     - Multiple eligible queries .... Query the user to choose a method.
     - No eligible queries .......... Error
@@ -380,6 +379,7 @@ Non-Interactive use: Lookup THE-THINGY via THE-METHOD.
   - THE-METHOD is the :NAME, a string, of a method stored in `mjr-thingy-lookeruper-methods'.
   - THE-THINGY is an object, usually a string, to look up with the named method.
   - If THE-METHOD is not found on `mjr-thingy-lookeruper-methods', then error.
+  - None of the method predicates are evaluated -- i.e. the lookup is always attempted
 Results:
  - Methods that use a shell command place the results in the buffer *thingy-lookup-results*.
  - Methods that use a Lisp function
