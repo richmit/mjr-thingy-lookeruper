@@ -19,7 +19,7 @@
 ;; TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ;; Author:      Mitch Richling
-;; Version:     1.34
+;; Version:     1.35
 ;; Keywords:    mjr-thingy-lookeruper
 ;; URL:         https://github.com/richmit/mjr-thingy-lookeruper
 
@@ -305,19 +305,11 @@
 A list lookup methods for `mjr-thingy-lookeruper'.  Each entry is a property list:
  - :name -- A string with the name of the method (Required)
  * :desc -- A string with a description of the method (Optional)
- * :pred -- A predicate function that must be evaluate to non-nil for a method to be used.  (Optional)
-            If missing or nil, the method may be used.
-            Frequently used to make sure necessary code has been loaded before use.
-
  * :reqp -- Predicate function checking runtime requirements for method.   
  * :optp -- Predicate function checking runtime suggestions for method.  Suppressed with prefix argument.
             This may be a list of mode symbols in which case the buffer `major-mode' must be on this list
  * :tokp -- Predicate function checking the thing for validity
             This can be a a STRING in which case the thingy is checked by `string-match-p' with :totp as the regex.
-
-
- * :mode -- A list of major mode symbols used to a buffer's major mode.  (Optional)
-            If missing or nil, the method may be used with buffers of any mode
  * :atpt -- A function used to thingy (usually a string but not necessarily) from buffer.  (Optional)
             If missing or nil, the method may only be used with an active region.
  * :actn -- A function or shell command string used to perform the lookup.  (Required)
@@ -326,8 +318,9 @@ The functions `mjr-thingy-lookeruper-get-built-in', `mjr-thingy-lookeruper-add-m
 may be helpfull to manage this list."
   :type '(repeat (plist :key-type (choice (const :name)
                                           (const :desc)
-                                          (const :pred)
-                                          (const :mode)
+                                          (const :reqp)
+                                          (const :optp)
+                                          (const :tokp)
                                           (const :atpt)
                                           (const :actn))))
   :group 'mjr-thingy-lookeruper)
