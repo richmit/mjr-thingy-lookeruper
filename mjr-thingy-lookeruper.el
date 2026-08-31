@@ -19,7 +19,7 @@
 ;; TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ;; Author:      Mitch Richling
-;; Version:     1.33
+;; Version:     1.34
 ;; Keywords:    mjr-thingy-lookeruper
 ;; URL:         https://github.com/richmit/mjr-thingy-lookeruper
 
@@ -205,7 +205,7 @@
           :desc "Lookup an ISBN (10 or 13) number on isbnsearch.org using browse-url (emacs)"
           :atpt (lambda () (and (thing-at-point-looking-at "\\b\\([0-9]\\{10\\}\\|[0-9]-[0-9]\\{6\\}-[0-9][0-9]-[0-9]\\|[0-9]\\{13\\}\\|[0-9]\\{3\\}-[0-9]-[0-9]\\{5\\}-[0-9]\\{3\\}-[0-9]\\)\\b" 25) (match-string 1)))
           :actn (lambda (thingy) (browse-url (concat "https://isbnsearch.org/isbn/" (url-hexify-string (replace-regexp-in-string "[^0-9]" "" thingy))))))
-   ;;; Common stuff
+   ;; Common stuff
     (list :name "man"
           :desc "Look for a UNIX man page via man (emacs)."
           :atpt (lambda () (and (thing-at-point-looking-at "\\b\\([a-z0-9_-]+\\)\\b" 20) (match-string 1)))
@@ -218,7 +218,7 @@
           :actn (if-let* ((tmp (locate-file "fstat" exec-path (list ".pl"))))
                     "fstat.pl '%Q'"
                   "stat '%Q'"))
-   ;;; Less common things
+   ;; Less common things
     (list :name "URL"
           :desc "Hand URL to browser using browse-url (emacs)."
           :atpt (lambda () (thing-at-point 'url))
@@ -251,27 +251,43 @@
                                (and tmp (cl-find tmp (system-users) :test #'string-equal))))
             :actn "getent passwd %Q"))
     (when (and (eq system-type 'windows-nt) (executable-find "PowerShell"))
-      (list :name "win-uid"
+      (list :name "win-user-sid"
             :desc "Lookup a windows SID for user (PowerShell)."
             :atpt (lambda () (and (thing-at-point-looking-at "\\b[sS]-1\\(-[0-9]+\\)+\\b" 100) (match-string 0)))
             :tokp "\\`[sS]-1\\(-[0-9]+\\)+\\'"
             :qokp (lambda (q) (string-match-p "\\`S-1\\(-[0-9]+\\)\\'" q))
             :actn "PowerShell -Command 'Get-LocalUser -SID %Q | Format-List'"))
     (when (and (eq system-type 'windows-nt) (executable-find "PowerShell"))
-      (list :name "win-uname"
+      (list :name "win-user-name"
             :desc "Lookup a windows user name (PowerShell)."
+            ;; The TaP only detects names with no spaces
             :atpt (lambda () (and (thing-at-point-looking-at "\\b\\([^]\\\\/:;|=,+*?<>@[:space:]\n\r[]+\\)\\b" 40) (match-string 1)))
-            :tokp "\\`[^]\\\\/:;|=,+*?<>@[:space:]\n\r[]+\\'"
-            :actn "PowerShell -Command 'Get-LocalUser -Name %Q | Format-List'"))
+            :actn "PowerShell -Command 'Get-LocalUser -Name \"%Q\" | Format-List'"))
+    (when (and (eq system-type 'windows-nt) (executable-find "PowerShell"))
+      (list :name "win-group-name"
+            :desc "Lookup a windows group name (PowerShell)."
+            ;; The TaP only detects names with no spaces
+            :atpt (lambda () (and (thing-at-point-looking-at "\\b\\([^]\\\\/:;|=,+*?<>@[:space:]\n\r[]+\\)\\b" 40) (match-string 1)))
+            :actn "PowerShell -Command 'Get-LocalGroup -Name \"%Q\" | Format-List'"))
+    (when (and (eq system-type 'windows-nt) (executable-find "PowerShell"))
+      (list :name "win-group-sid"
+            :desc "Lookup a windows SID for group (PowerShell)."
+            :atpt (lambda () (and (thing-at-point-looking-at "\\b[sS]-1\\(-[0-9]+\\)+\\b" 100) (match-string 0)))
+            :tokp "\\`[sS]-1\\(-[0-9]+\\)+\\'"
+            :qokp (lambda (q) (string-match-p "\\`S-1\\(-[0-9]+\\)\\'" q))
+            :actn "PowerShell -Command 'Get-LocalGroup -SID %Q | Format-List'"))
     (list :name "DNS"
           :desc "Lookup host name via dns-lookup-host (emacs)."
-          :atpt (lambda () (and (thing-at-point-looking-at "\\([.a-zA-Z0-9_-]+\\.\\(com\\|edu\\|org\\|gov\\)\\)\\b" 20) (match-string 1)))
+          ;; The TaP only detects a limited number of TLDs
+          :atpt (lambda () (and (thing-at-point-looking-at "\\([.a-zA-Z0-9_-]+\\.\\(com\\|edu\\|org\\|gov\\|me\\)\\)\\b" 20) (match-string 1)))
+          :tokp "\\`[.a-zA-Z0-9_-]+\\'"
           :actn #'dns-lookup-host)
     (list :name "IPv4"
           :desc "Lookup IPv4 address via dns-lookup-host (emacs)."
-          :atpt (lambda () (and (thing-at-point-looking-at "\\b\\(\\([0-9]+\\)\\.\\([0-9]+\\)\\.\\([0-9]+\\)\\.\\([0-9]+\\)\\)\\b" 20)
-                                (cl-every (lambda (x) (let ((y (string-to-number (match-string x)))) (and (<= 0 y) (>= 255 y)))) '(2 3 4 5))
-                                (match-string 1)))
+          :atpt (lambda () (and (thing-at-point-looking-at "\\b\\([0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+\\)\\b" 20) (match-string 1)))
+          :tokp (lambda (q) (and (stringp q)
+                                 (string-match "\\`\\(\\([0-9]+\\)\\.\\([0-9]+\\)\\.\\([0-9]+\\)\\.\\([0-9]+\\)\\)\\'" q)
+                                 (cl-every (lambda (x) (let ((y (string-to-number (match-string x q)))) (and (<= 0 y) (>= 255 y)))) '(2 3 4 5))))
           :actn #'dns-lookup-host)
     )))
 
