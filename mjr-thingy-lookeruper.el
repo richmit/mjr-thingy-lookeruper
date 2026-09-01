@@ -19,7 +19,7 @@
 ;; TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ;; Author:      Mitch Richling
-;; Version:     1.35
+;; Version:     1.36
 ;; Keywords:    mjr-thingy-lookeruper
 ;; URL:         https://github.com/richmit/mjr-thingy-lookeruper
 
@@ -289,6 +289,13 @@
                                  (string-match "\\`\\(\\([0-9]+\\)\\.\\([0-9]+\\)\\.\\([0-9]+\\)\\.\\([0-9]+\\)\\)\\'" q)
                                  (cl-every (lambda (x) (let ((y (string-to-number (match-string x q)))) (and (<= 0 y) (>= 255 y)))) '(2 3 4 5))))
           :actn #'dns-lookup-host)
+    (when (executable-find "git")
+      (list :name "git-commit"
+            :desc "Lookup a commit in windows user name (PowerShell)."
+            :reqp (lambda () (file-directory-p ".git"))
+            :atpt (lambda () (and (thing-at-point-looking-at "\\b\\([0-9a-f]\\{40\\}\\)\\b" 41) (match-string 1)))
+            :tokp (lambda (q) (and (stringp q) (string-match-p "\\`[0-9a-f]\\{40\\}\\'" q)))
+            :actn "git show %Q"))
     )))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
