@@ -15,18 +15,18 @@ The primary entry point is the function `mjr-thingy-lookeruper` which I bind the
 Several example lookup methods are provided in variable `mjr-thingy-lookeruper-built-in-methods`:
 
   - UNIX man pages
-  - Operating group IDs, group names, user IDs, user names
-  - Windows user name and user SID
+  - UNIX-ish users & groups via names or numerical ID
+  - Windows users & groups via names or SID
+  - Git commits/diffs
   - DNS queries
   - Dictionary words
   - Data about files
   - URLs
   - Internet search queries (google, bing, & ebay)
-  - Symbols in several languages (Emacs lisp, Common Lisp, R, 
-    Perl, Python, Ruby, Julia, C, C++, Matlab, CMake)
+  - Symbols in several languages (Emacs lisp, Common Lisp, R, Perl, Python, Ruby, Julia, C, C++, Matlab, CMake)
   - C & C++ header files
   - ST Micro STM32 parts
-  - Books via ISBN
+  - Documents & Books by DOI or ISBN
 
 The methods for looking things up are defined in the variable `mjr-thingy-lookeruper-methods`.  By default this variable is set to the contents of
 `mjr-thingy-lookeruper-built-in-methods`.  The variable may be customizing `mjr-thingy-lookeruper-methods`.
