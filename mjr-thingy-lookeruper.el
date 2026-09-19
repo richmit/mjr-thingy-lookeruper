@@ -54,7 +54,7 @@
 ;;   - Symbols in several languages (Emacs lisp, Common Lisp, R, Perl, Python, Ruby, Julia, C, C++, Matlab, CMake)
 ;;   - C & C++ header files
 ;;   - ST Micro STM32 parts
-;;   - Documents & Books by DOI or ISBN
+;;   - Documents & Books by DOI, ISBN, & bibcode
 ;;
 ;; The methods for looking things up are defined in the variable `mjr-thingy-lookeruper-methods'.  By default this variable is set to the contents of
 ;; `mjr-thingy-lookeruper-built-in-methods'.  The variable may be customizing `mjr-thingy-lookeruper-methods'.
@@ -312,6 +312,12 @@
           :desc "Lookup a DOI on doi.org using browse-url (emacs)"
           :atpt (lambda () (and (thing-at-point-looking-at "\\b\\(doi:\\)\\{0,1\\}\\(10\\.[^/[:space:]\n\r]+/[^[:space:]\n\r]+\\)\\b" 100) (match-string 2)))
           :actn (lambda (thingy) (browse-url (concat "https://doi.org/" (url-hexify-string thingy)))))
+    (list :name "ADS_Bibcode"
+          :desc "Lookup a bibcode on ui.adsabs.harvard.edu using browse-url (emacs)"
+          :atpt (lambda () (and (thing-at-point-looking-at "\\bbibcode:[[:space:]]*\\([^[:space:]\n\r]+\\)\\b" 100) (match-string 1)))
+          :actn (lambda (thingy) (browse-url (concat "https://ui.adsabs.harvard.edu/search/fq=%7B!type%3Daqp%20v%3D%24fq_database%7D&fq_database=(database%3Aastronomy%20OR%20database%3Aphysics)&q=bibcode%3A" 
+                                                     (url-hexify-string thingy) 
+                                                     "&sort=date%20desc%2C%20bibcode%20desc&p_=0"))))
     )))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
