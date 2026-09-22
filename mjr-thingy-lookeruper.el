@@ -19,7 +19,7 @@
 ;; TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ;; Author:      Mitch Richling
-;; Version:     1.38
+;; Version:     1.39
 ;; Keywords:    mjr-thingy-lookeruper
 ;; URL:         https://github.com/richmit/mjr-thingy-lookeruper
 
@@ -55,6 +55,7 @@
 ;;   - C & C++ header files
 ;;   - ST Micro STM32 parts
 ;;   - Documents & Books by DOI, ISBN, & bibcode
+;;   - Zotero items via DOI, ISBN, Zotero item-key, or even a complex search expression.  Expressions are only supported with selection.
 ;;
 ;; The methods for looking things up are defined in the variable `mjr-thingy-lookeruper-methods'.  By default this variable is set to the contents of
 ;; `mjr-thingy-lookeruper-built-in-methods'.  The variable may be customizing `mjr-thingy-lookeruper-methods'.
@@ -318,6 +319,17 @@
           :actn (lambda (thingy) (browse-url (concat "https://ui.adsabs.harvard.edu/search/fq=%7B!type%3Daqp%20v%3D%24fq_database%7D&fq_database=(database%3Aastronomy%20OR%20database%3Aphysics)&q=bibcode%3A" 
                                                      (url-hexify-string thingy) 
                                                      "&sort=date%20desc%2C%20bibcode%20desc&p_=0"))))
+    (list :name "Zotero"
+          :desc "Lookup a Zotero match-specifier (emacs/zotreo/browser)"
+          :reqp (lambda () (and (fboundp 'mjr-zotero-match-specifier-at-point)
+                                (fboundp 'mjr-zotero-connector-open-item)
+                                (fboundp 'mjr-zotero-db-cache-open-item)
+                                (fboundp 'mjr-zotero-looks-like-item-key)))
+          :atpt (lambda () (mjr-zotero-match-specifier-at-point))
+          :actn (lambda (thingy) (or (mjr-zotero-db-cache-open-item thingy t)
+                                     (when (mjr-zotero-looks-like-item-key thingy)
+                                       (mjr-zotero-connector-open-item thingy)))))
+
     )))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
