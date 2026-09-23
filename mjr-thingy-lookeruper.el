@@ -19,7 +19,7 @@
 ;; TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ;; Author:      Mitch Richling
-;; Version:     1.39
+;; Version:     1.40
 ;; Keywords:    mjr-thingy-lookeruper
 ;; URL:         https://github.com/richmit/mjr-thingy-lookeruper
 
@@ -321,15 +321,11 @@
                                                      "&sort=date%20desc%2C%20bibcode%20desc&p_=0"))))
     (list :name "Zotero"
           :desc "Lookup a Zotero match-specifier (emacs/zotreo/browser)"
-          :reqp (lambda () (and (fboundp 'mjr-zotero-match-specifier-at-point)
-                                (fboundp 'mjr-zotero-connector-open-item)
-                                (fboundp 'mjr-zotero-db-cache-open-item)
-                                (fboundp 'mjr-zotero-looks-like-item-key)))
+          :reqp (lambda () (require 'mjr-zotero nil t))
           :atpt (lambda () (mjr-zotero-match-specifier-at-point))
           :actn (lambda (thingy) (or (mjr-zotero-db-cache-open-item thingy t)
                                      (when (mjr-zotero-looks-like-item-key thingy)
                                        (mjr-zotero-connector-open-item thingy)))))
-
     )))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -350,7 +346,7 @@ A list lookup methods for `mjr-thingy-lookeruper'.  Each entry is a property lis
  * :optp -- Predicate function checking runtime suggestions for method.  Suppressed with prefix argument.
             This may be a list of mode symbols in which case the buffer `major-mode' must be on this list
  * :tokp -- Predicate function checking the thing for validity
-            This can be a a STRING in which case the thingy is checked by `string-match-p' with :totp as the regex.
+            This can be a STRING in which case the thingy is checked by `string-match-p' with :totp as the regex.
  * :atpt -- A function used to thingy (usually a string but not necessarily) from buffer.  (Optional)
             If missing or nil, the method may only be used with an active region.
  * :actn -- A function or shell command string used to perform the lookup.  (Required)
