@@ -19,7 +19,7 @@
 ;; TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ;; Author:      Mitch Richling
-;; Version:     1.40
+;; Version:     1.41
 ;; Keywords:    mjr-thingy-lookeruper
 ;; URL:         https://github.com/richmit/mjr-thingy-lookeruper
 
@@ -326,6 +326,13 @@
           :actn (lambda (thingy) (or (mjr-zotero-db-cache-open-item thingy t)
                                      (when (mjr-zotero-looks-like-item-key thingy)
                                        (mjr-zotero-connector-open-item thingy)))))
+    (list :name "OIES"
+          :desc "Lookup a sequence of integers on oeis.org using browse-url (emacs)"
+          :atpt (lambda () (and (thing-at-point-looking-at "\\b\\([[:digit:]]+\\([,; \t]+?[[:digit:]]+\\)\\{4,\\}\\)\\b" 100) (match-string 1)))
+          :tokp (lambda (q) (message "HI") (and (stringp q) (string-match "\\`[[:space:]]*[[:digit:]]+\\([,; \t]+?[[:digit:]]+\\)\\{4,\\}[[:space:]]*\\'" q)))
+          :actn (lambda (thingy) (browse-url (concat "https://oeis.org/search?q="
+                                                     (url-hexify-string (replace-regexp-in-string "[^[:digit:]]+" "," (string-trim thingy)))
+                                                     "&language=english&go=Search"))))
     )))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
