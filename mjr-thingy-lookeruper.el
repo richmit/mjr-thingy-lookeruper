@@ -19,7 +19,7 @@
 ;; TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ;; Author:      Mitch Richling
-;; Version:     1.43
+;; Version:     1.44
 ;; Keywords:    mjr-thingy-lookeruper
 ;; URL:         https://github.com/richmit/mjr-thingy-lookeruper
 
@@ -446,12 +446,12 @@ Variables:
                                               for thingy = (when (let ((cur-method-reqp (plist-get cur-method-properties :reqp))
                                                                        (cur-method-optp (plist-get cur-method-properties :optp)))
                                                                    (and (or (null cur-method-reqp)       ;; Check :reqp
-                                                                            (function cur-method-reqp))
+                                                                            (funcall cur-method-reqp))
                                                                         (or current-prefix-arg           ;; Check :optp
                                                                             (null cur-method-optp)
                                                                             (if (listp cur-method-optp)
                                                                                 (member major-mode cur-method-optp)
-                                                                                (funcall cur-method-optp)))))                                                
+                                                                                (funcall cur-method-optp)))))
                                                              (let ((pot-thingy (or region-string ;; Get potential thingy from buffer
                                                                                    (when-let* ((cur-method-tap (plist-get cur-method-properties :atpt)))
                                                                                      (funcall cur-method-tap)))))
