@@ -19,7 +19,7 @@
 ;; TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ;; Author:      Mitch Richling
-;; Version:     1.41
+;; Version:     1.43
 ;; Keywords:    mjr-thingy-lookeruper
 ;; URL:         https://github.com/richmit/mjr-thingy-lookeruper
 
@@ -55,7 +55,8 @@
 ;;   - C & C++ header files
 ;;   - ST Micro STM32 parts
 ;;   - Documents & Books by DOI, ISBN, & bibcode
-;;   - Zotero items via DOI, ISBN, Zotero item-key, or even a complex search expression.  Expressions are only supported with selection.
+;;   - Zotero items via DOI, ISBN, or Zotero item-key
+;;   - The On-Line Encyclopedia of Integer Sequences (OEIS)
 ;;
 ;; The methods for looking things up are defined in the variable `mjr-thingy-lookeruper-methods'.  By default this variable is set to the contents of
 ;; `mjr-thingy-lookeruper-built-in-methods'.  The variable may be customizing `mjr-thingy-lookeruper-methods'.
