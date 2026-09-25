@@ -19,7 +19,7 @@
 ;; TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ;; Author:      Mitch Richling
-;; Version:     1.44
+;; Version:     1.45
 ;; Keywords:    mjr-thingy-lookeruper
 ;; URL:         https://github.com/richmit/mjr-thingy-lookeruper
 
@@ -323,9 +323,9 @@
     (list :name "Zotero"
           :desc "Lookup a Zotero match-specifier (emacs/zotreo/browser)"
           :reqp (lambda () (require 'mjr-zotero nil t))
-          :atpt (lambda () (mjr-zotero-match-specifier-at-point))
+          :atpt (lambda () (mjr-zotero-match-specifier-at-point t))
           :actn (lambda (thingy) (or (mjr-zotero-db-cache-open-item thingy t)
-                                     (when (mjr-zotero-looks-like-item-key thingy)
+                                     (when (stringp thingy)
                                        (mjr-zotero-connector-open-item thingy)))))
     (list :name "OIES"
           :desc "Lookup a sequence of integers on oeis.org using browse-url (emacs)"
