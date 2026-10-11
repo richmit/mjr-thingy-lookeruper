@@ -19,7 +19,7 @@
 ;; TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ;; Author:      Mitch Richling
-;; Version:     1.48
+;; Version:     1.49
 ;; Keywords:    mjr-thingy-lookeruper
 ;; URL:         https://github.com/richmit/mjr-thingy-lookeruper
 
@@ -374,7 +374,7 @@ may be helpfull to manage this list."
 (defun mjr-thingy-lookeruper-get-built-in (method-name)
   "Return the built-in method by name.
 Built-In methods are stored in `mjr-thingy-lookeruper-built-in-methods'."
-  (cl-find-if (lambda (x) (string-equal method-name (plist-get x :name))) mjr-thingy-lookeruper-built-in-methods))
+  (cl-find-if (lambda (x) (and x (string-equal method-name (plist-get x :name)))) mjr-thingy-lookeruper-built-in-methods))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;###autoload
@@ -442,7 +442,7 @@ Variables:
  - `mjr-thingy-lookeruper-methods' .. Defines lookup methods.  Examples include uname, gname, uid, gid, host name, dictionary word, and Google search."
   (interactive (let* ((region-string (and transient-mark-mode (region-active-p) (mark) (buffer-substring-no-properties (region-beginning) (region-end))))
                       (candidates    (cl-loop for cur-method-properties in mjr-thingy-lookeruper-methods
-                                              for thingy = (when (and cur-method-reqp
+                                              for thingy = (when (and cur-method-properties
                                                                       (let ((cur-method-reqp (plist-get cur-method-properties :reqp))
                                                                             (cur-method-optp (plist-get cur-method-properties :optp)))
                                                                         (and (or (null cur-method-reqp)       ;; Check :reqp
